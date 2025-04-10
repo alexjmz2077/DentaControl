@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         locale: 'es',
         selectable: true,
         editable: true,
+        selectMirror: true,
         events: urlObtenerCitas,
         displayEventEnd: true,  // Mostrar hora de fin
         eventDisplay: 'block',  // Mostrar eventos como bloques
@@ -30,10 +31,32 @@ document.addEventListener('DOMContentLoaded', function() {
             minute: '2-digit',
             hour12: true
         },
+        slotEventOverlap: false, // Evita que los eventos se superpongan
+        eventMaxStack: 1, // Limita el número de eventos que se pueden apilar
+        eventMinHeight: 30, // Altura mínima de los eventos
+        slotLabelInterval: '01:00:00', // Intervalo de etiquetas de tiempo
+        slotDuration: '00:30:00', // Duración de cada slot
+        expandRows: true, // Expande las filas para mejor visualización
+
+        views: {
+            timeGrid: {
+                eventMinHeight: 30, // Altura mínima de eventos en vista de tiempo
+                slotEventOverlap: false, // No permitir superposición en vista de tiempo
+            }
+        },
         select: function(info) {
             openCitaPopup(null, info.start);
         },
+        dateClick: function(info) {
+            // Añadir manejo de click simple para dispositivos móviles
+            openCitaPopup(null, info.date);
+        },
         eventClick: function(info) {
+            // Cerrar cualquier popover abierto
+            const popover = document.querySelector('.fc-more-popover');
+            if (popover) {
+                popover.remove();
+            }
             openCitaPopup(info.event);
         },
         eventClassNames: function(arg) {
@@ -74,9 +97,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`${urlObtenerPacientes}?cedula=${filtro}`);
             const pacientes = await response.json();
             const select = document.getElementById('paciente');
+            
+            // Ordenar pacientes por cédula numéricamente
+            pacientes.sort((a, b) => {
+                const cedulaA = parseInt(a.cedula);
+                const cedulaB = parseInt(b.cedula);
+                return cedulaA - cedulaB;
+            });
+
+            // Limpiar y agregar la opción por defecto
             select.innerHTML = '<option value="">Seleccione un paciente</option>';
+            
+            // Agregar pacientes ordenados
             pacientes.forEach(paciente => {
-                select.innerHTML += `<option value="${paciente.id}">${paciente.nombres} ${paciente.apellidos} - ${paciente.cedula}</option>`;
+                select.innerHTML += `<option value="${paciente.id}">${paciente.cedula} - ${paciente.nombres} ${paciente.apellidos}</option>`;
             });
         } catch (error) {
             console.error('Error al cargar pacientes:', error);
@@ -137,6 +171,56 @@ document.addEventListener('DOMContentLoaded', function() {
             delete form.dataset.isEdit;
         }
         
+        // Configurar el evento de filtrado para el select
+        const pacienteSelect = document.getElementById('paciente');
+        let filterBuffer = '';
+        let filterTimeout;
+
+        // Evento para capturar entrada de texto
+        pacienteSelect.addEventListener('keydown', function(e) {
+            // Solo procesar números y backspace
+            if (!/^\d$/.test(e.key) && e.key !== 'Backspace') {
+                return;
+            }
+
+            e.preventDefault();
+
+            // Actualizar el buffer de búsqueda
+            if (e.key === 'Backspace') {
+                filterBuffer = filterBuffer.slice(0, -1);
+            } else {
+                filterBuffer += e.key;
+            }
+
+            // Aplicar el filtro a las opciones existentes
+            const options = Array.from(pacienteSelect.options);
+            options.forEach(option => {
+                if (option.value === '') return; // Saltar la opción por defecto
+                
+                const cedula = option.text.split(' - ')[1]; // Obtener la cédula del texto
+                if (cedula && cedula.startsWith(filterBuffer)) {
+                    option.style.display = '';
+                    if (!pacienteSelect.value) {
+                        pacienteSelect.value = option.value;
+                    }
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+
+            // Limpiar el buffer después de un tiempo
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                filterBuffer = '';
+            }, 1500);
+        });
+
+        // Limpiar filtro al cerrar el select
+        pacienteSelect.addEventListener('blur', function() {
+            Array.from(pacienteSelect.options).forEach(opt => opt.style.display = '');
+            filterBuffer = '';
+        });
+
         popup.style.display = 'block';
     };
 
@@ -275,15 +359,33 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.popup-content').addEventListener('click', function(e) {
         e.stopPropagation();
     });
+
+    // Agregar manejador global para cerrar popovers
+    document.addEventListener('click', function(e) {
+        // Si el clic no fue dentro de un popover o sus elementos
+        if (!e.target.closest('.fc-more-popover') && !e.target.closest('.fc-daygrid-more-link')) {
+            const popover = document.querySelector('.fc-more-popover');
+            if (popover) {
+                popover.remove();
+            }
+        }
+    });
 });
 
 // Modificar la función closePopup
 window.closePopup = function(popupId) {
     const popup = document.getElementById(popupId);
+    const pacienteSelect = document.getElementById('paciente');
+    
+    // Crear nuevo select para eliminar event listeners
+    if (pacienteSelect) {
+        const newSelect = pacienteSelect.cloneNode(true);
+        pacienteSelect.parentNode.replaceChild(newSelect, pacienteSelect);
+    }
+    
     popup.style.display = 'none';
     document.body.classList.remove('popup-open');
     
-    // Limpiar el formulario al cerrar
     if (popupId === 'citaPopup') {
         const form = document.getElementById('citaForm');
         form.reset();

@@ -27,14 +27,17 @@
     font-weight: 500;
 }
 
+
+
 .form-group input,
 .form-group select,
 .form-group textarea {
-    width: 100%;
+    width: -webkit-fill-available;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 14px;
+    
 }
 
 .form-group textarea {
@@ -95,9 +98,9 @@
 /* Actualizar estilos del popup */
 .popup {
     position: fixed;
-
-    width: 100%;
-
+    
+    width: -webkit-fill-available;
+    height: 100%;
     background-color: rgba(3, 23, 73, 0.5);
     display: flex;
     justify-content: center;
@@ -117,7 +120,11 @@
     margin: auto;
     transform: translateY(0);
     animation: popupFadeIn 0.3s ease;
+    align-items: center;
+    align-content: center;
+    top: 10%;
 }
+
 
 /* Añadir animación para el popup */
 @keyframes popupFadeIn {
@@ -201,6 +208,7 @@ body.popup-open {
     margin: 1px 0 !important;
     cursor: pointer !important;
     color: white !important;
+    width: 100% !important;
 }
 
 .fc-event:hover {
@@ -262,6 +270,12 @@ body.popup-open {
 }
 
 /* Estilos para inputs y selects cuando están enfocados */
+.form-group{
+    overflow: hidden;
+    width: 100%;
+}
+
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -306,3 +320,64 @@ body.popup-open {
     border-color: #ff0000;
     border-width: 5px;
 }
+
+/* Ajustar el ancho máximo de los eventos para dejar espacio libre */
+.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
+    width: 100%;
+}
+
+.fc-timegrid-event-harness {
+    width: auto !important; /* Limita el ancho del contenedor del evento */
+}
+
+/* Asegurar que las celdas de tiempo sean clickeables */
+.fc-timegrid-col-events {
+    position: relative;
+    z-index: 1;
+    margin: 0 !important;
+    padding: 0 2px !important;
+    width: 90%;
+}
+
+/* Ajustar el espaciado vertical entre eventos */
+.fc-timegrid-event-harness {
+    margin-top: 1px !important;
+    margin-bottom: 1px !important;
+}
+
+.fc-event .fc-event-draggable .fc-event-resizable .fc-event-start .fc-event-end .fc-event-past .fc-event-today .past-event .fc-timegrid-event .fc-v-event .past-event{
+    width: 100%;
+}
+
+.fc-timegrid-event, .fc-timegrid-more-link {
+    width: 20% ;
+}
+
+
+
+
+
+/* Mejorar la interacción táctil para móviles */
+@media only screen and (max-width: 768px) {
+    .fc-timegrid-event-harness {
+        width: 100% !important; /* Más espacio en móviles */
+    }
+
+    .fc-timegrid-event {
+        min-height: 40px !important; /* Eventos más altos en móviles */
+    }
+
+    .fc-timegrid-slot {
+        height: 50px !important; /* Celdas más altas en móviles */
+    }
+
+    .fc-timegrid-more-link .fc-more-link{
+        width: 25%;
+    }
+
+    .fc-timegrid-col-events {
+
+        width: 90%;
+    }
+}
+

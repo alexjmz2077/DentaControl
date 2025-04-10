@@ -149,11 +149,12 @@ def eliminar_paciente(request, id):
 
 def oauth2callback(request):
     try:
-        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # Permite HTTP en desarrollo
+        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         
+        # Usar la ruta desde settings
         flow = Flow.from_client_secrets_file(
-            'credentials.json',
-            scopes=['https://www.googleapis.com/auth/calendar'],
+            settings.GOOGLE_CALENDAR_CREDENTIALS_FILE,
+            scopes=settings.GOOGLE_CALENDAR_SCOPES,
             redirect_uri=request.build_absolute_uri('/oauth2callback/')
         )
         
@@ -450,9 +451,16 @@ def eliminar_cita(request, id):
 @login_required
 def google_auth(request):
     try:
+        # Verificar si el archivo existe
+        if not os.path.exists(settings.GOOGLE_CALENDAR_CREDENTIALS_FILE):
+            print(f"Archivo de credenciales no encontrado en: {settings.GOOGLE_CALENDAR_CREDENTIALS_FILE}")
+            return JsonResponse({
+                'error': 'Archivo de credenciales no encontrado'
+            }, status=500)
+
         flow = Flow.from_client_secrets_file(
-            'credentials.json',
-            scopes=['https://www.googleapis.com/auth/calendar'],
+            settings.GOOGLE_CALENDAR_CREDENTIALS_FILE,
+            scopes=settings.GOOGLE_CALENDAR_SCOPES,
             redirect_uri=request.build_absolute_uri('/oauth2callback/')
         )
         

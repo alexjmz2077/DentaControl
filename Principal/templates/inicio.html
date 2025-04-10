@@ -8,9 +8,11 @@
     <title>DentaControl</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/general.css' %}">
+    <link rel="stylesheet" href="{% static 'css/inicio.css' %}">
     <!-- <script src="{% static 'js/fun.js' %}" defer></script> --> 
-    <script src="{% static 'js/fun.js' %}" defer></script>
+    <script src="{% static 'js/general.js' %}" defer></script>
+    <script src="{% static 'js/inicio.js' %}" defer></script>
     <script>
         // Definir las URLs en el contexto global de JavaScript
         const urlInicio = "{% url 'inicio' %}";
@@ -23,14 +25,17 @@
 <body>
     <div class="sidebar" id="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a onclick="Salir()">Inicio</a>
-        <a onclick="Citas()">Citas</a>
-
+        <a onclick="Salir()" class="sidebar_menu">Inicio</a>
+        {% if user.is_authenticated %}
+        <a onclick="Citas()" class="sidebar_menu">Citas</a>
+        {% else %}
+        <a onclick="showLoginMessage()" class="sidebar_menu">Citas</a>
+        {% endif %}
     </div>
     <div class="container">
         <header>
             <button class="menu" onclick="openNav()">≡</button>
-            <img src="{% static 'img/logoSoftware.webp' %}" alt="Logo" class="logo"> 
+            <img src="{% static 'img/logoSoftware.webp' %}" alt="Logo" class="logo" onclick="Salir()"> 
             
             <div class="auth-buttons">
                 {% if user.is_authenticated %}
@@ -145,7 +150,11 @@
                       <div class="info">
                         <p class="text-wrapper-2">Organiza y gestiona las citas de tus pacientes de manera eficiente.</p> <!-- Descripcion del evento-->
                         <div class="frame-2">
-                            <div class="tag" ><div class="element-seats-left" onclick="Citas()" >Agendar nueva Cita </div></div><!-- Registrar un nuevo evento -->
+                            {% if user.is_authenticated %}
+                            <div class="tag" ><div class="element-seats-left" onclick="Citas()" >Citas</div></div><!-- Registrar un nuevo evento -->
+                            {% else %}
+                            <div class="tag" ><div class="element-seats-left" onclick="showLoginMessage()" >Citas</div></div><!-- Registrar un nuevo evento -->
+                            {% endif %}
                         </div>
                       </div>
                     </div>
@@ -164,22 +173,28 @@
                     </div>
                   </div>
                   <div class="event">
-                    <img class="img" src="{% static 'img/img3.webp' %}" />
+                    <img class="img" src="{% static 'img/cono.png' %}" />
                     <div class="div">
-                      <div class="event-title-wrapper"><div class="event-title">Chequeo Dental</div></div>
+                      <div class="event-title-wrapper"><div class="event-title">Proximamente</div></div>
                       <div class="info">
-                        <p class="text-wrapper-2">Descripcion</p>
-                        <div class="text-wrapper-2">Consultorio Dental</div>
+                        <p class="text-wrapper-2">Descripcion.</p> <!-- Descripcion del evento-->
+                        <div class="frame-2">
+                            <div class="tag"><div class="element-seats-left">Accion 1</div></div><!-- Registrar un nuevo evento -->
+                            <div class="tag"><div class="element-seats-left">Accion 2 </div></div> <!-- Visualizar el evento -->
+                        </div>
                       </div>
                     </div>
                   </div>
                   <div class="event">
-                    <img class="img" src="{% static 'img/img4.webp' %}" />
+                    <img class="img" src="{% static 'img/cono.png' %}" />
                     <div class="div">
-                      <div class="event-title-wrapper"><div class="event-title">Tratamiento de Conducto</div></div>
+                      <div class="event-title-wrapper"><div class="event-title">Proximamente</div></div>
                       <div class="info">
-                        <p class="text-wrapper-2">Descripcion</p>
-                        <div class="text-wrapper-2">Consultorio Dental</div>
+                        <p class="text-wrapper-2">Descripcion.</p> <!-- Descripcion del evento-->
+                        <div class="frame-2">
+                            <div class="tag"><div class="element-seats-left">Accion 1</div></div><!-- Registrar un nuevo evento -->
+                            <div class="tag"><div class="element-seats-left">Accion 2 </div></div> <!-- Visualizar el evento -->
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -259,5 +274,3 @@
 
 <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css"/>
-
-

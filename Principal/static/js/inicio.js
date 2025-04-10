@@ -1,10 +1,4 @@
-function Salir() {
-    window.location.href = urlInicio;
-}
 
-function Citas() {
-    window.location.href = urlCitas;
-}
 
 setTimeout(() => {
     closePopup('successPopup');
@@ -55,9 +49,7 @@ function closePopup(popupId) {
     document.getElementById(popupId).style.display = 'none';
 }
 
-function showLoginMessage() {
-    alert('Por favor, inicia sesión para comenzar.');
-}
+
 
 function tutorial() {
 

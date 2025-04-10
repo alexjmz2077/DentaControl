@@ -1,3 +1,4 @@
+/* Estilos base y compartidos */
 body, html {
     margin: 0;
     padding: 0;
@@ -8,6 +9,251 @@ body, html {
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+
+.sidebar_menu{
+    cursor: pointer;
+}
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header y navegación */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    flex-wrap: nowrap;
+}
+
+.logo {
+    width: 15%;
+    height: auto;
+    margin-left: 10px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.menu {
+    background: none;
+    border: none;
+    font-size: 35px;
+    font-size: 2.4rem;
+    cursor: pointer;
+    color: #031749;
+}
+
+/* Sidebar */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1100;
+    top: 0;
+    left: 0;
+    background-color: #031749;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 25px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #f1f1f1;
+}
+
+.sidebar .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+/* Botones de autenticación */
+.auth-buttons {
+    margin-left: auto;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+}
+
+.btn {
+    padding: 15px 50px;
+    background-color: #031749;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.15rem;
+    margin: 20px;
+    width: fit-content;
+    cursor: pointer;
+}
+
+.btn.inverted {
+    background-color: white;
+    color: #031749;
+    border: 2px solid #031749;
+    padding: 8px 15px;
+    font-size: 1rem;
+    border-radius: 20px;
+    transition: background-color 0.3s, color 0.3s;
+    width: fit-content;
+    display: inline-block;
+}
+
+.btn.inverted:hover {
+    background-color: #031749;
+    color: white;
+}
+
+.welcome-message {
+    font-size: 1rem;
+    color: #031749;
+    margin-right: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+/* Popups compartidos */
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 10px;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+.popup-content.wide {
+    max-width: 90%;
+    width: 1200px;
+}
+
+.popup-content h2 {
+    margin-top: 0;
+    font-size: 1.8rem;
+}
+
+.popup-content .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+/* Footer */
+footer {
+    padding: 30px;
+    background-color: #80849c;
+    margin-top: auto;
+    display: flex;
+}
+
+.footer-message {
+    font-size: 1rem;
+    font-weight: 500;
+    max-width: 50%;
+    line-height: 1.5;
+    text-align: left;
+    margin-right: auto;
+}
+
+.social-icons {
+    display: flex;
+    color: #031749;
+    padding: 20px;
+    text-decoration: none;
+    width: 100%;
+    justify-content: flex-end;
+    background-color: white;
+}
+
+.card {
+    display: flex;
+    justify-content: flex-end;
+    height: 70px;
+    width: 100%;
+    max-width: 350px;
+}
+
+/* Iconos sociales */
+.card svg {
+    transform: scale(1);
+    position: absolute;
+    display: flex;
+    width: 60%;
+    height: 100%;
+    font-size: 24px;
+    font-weight: 700;
+    opacity: 1;
+    transition: opacity 0.25s;
+    z-index: 2;
+    cursor: pointer;
+    fill: #031749;
+}
+
+/* Media queries compartidas */
+@media only screen and (max-width: 768px) {
+    header {
+        padding: 10px;
+    }
+
+    .logo {
+        width: 30%;
+    }
+
+    .menu {
+        font-size: 1.4rem;
+    }
+
+    .btn.inverted {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+
+    .welcome-message {
+        font-size: 0.60rem;
+    }
+
+    footer {
+        padding: 20px;
+    }
+
+    .footer-message {
+        font-size: 0.65rem;
+        max-width: 100%;
+    }
 }
 
 .action-buttons {
@@ -40,238 +286,7 @@ body, html {
     padding: 10px 20px;
 }
 
-.events-desktop {
-    display: flex;
-    width: 100%;
-    align-items: flex-start;
-    gap: 64px;
-    padding: 112px 64px;
-    position: relative;
-  }
-  
-  .events-desktop .frame {
-    display: flex;
-    flex-direction: column;
-    width: 30%;
-    height: 532px;
-    align-items: flex-start;
-    justify-content: space-between;
-    position: relative;
-  }
-  
-  .events-desktop .content {
-    align-self: stretch;
-    width: 100%;
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-    position: relative;
-  }
-  
-  .events-desktop .two-word-query-for {
-    position: relative;
-    align-self: stretch;
-    width: 100%;
-    height: 246px;
-    object-fit: cover;
-  }
-  
-  .events-desktop .heading {
-    position: relative;
-    align-self: stretch;
-    font-family: "Inter-Bold", Helvetica;
-    font-weight: 700;
-    color: #031749;
-    font-size: 32px;
-    letter-spacing: 0;
-    line-height: 41.6px;
-  }
-  
-  .events-desktop .description {
-    position: relative;
-    align-self: stretch;
-    font-family: "Inter-Regular", Helvetica;
-    font-weight: 400;
-    color: #031749;
-    font-size: 18px;
-    letter-spacing: 0;
-    line-height: 27px;
-  }
-  
-  .events-desktop .button {
-    all: unset;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 32px;
-    position: relative;
-    flex: 0 0 auto;
-    margin-bottom: -1.00px;
-    margin-left: -1.00px;
-    border-radius: 500px;
-    border: 1px solid;
-    border-color: #031749;
-  }
-  
-  .events-desktop .text-wrapper {
-    all: unset;
-    box-sizing: border-box;
-    position: relative;
-    width: fit-content;
-    font-family: "Inter-Regular", Helvetica;
-    font-weight: 400;
-    color: #031749;
-    font-size: 16px;
-    letter-spacing: 0;
-    line-height: 24px;
-    white-space: nowrap;
-  }
-  
-  .events-desktop .row {
-    display: flex;
-    flex-direction: column;
-    width: 55%;
-    align-items: flex-start;
-    gap: 24px;
-    position: relative;
-  }
-  
-  .events-desktop .event {
-    display: flex;
-    align-items: flex-start;
-    gap: 24px;
-    padding: 16px;
-    position: relative;
-    align-self: stretch;
-    width: 100%;
-    flex: 0 0 auto;
-    border-radius: 4px;
-    border: 1px solid;
-    border-color: #031749;
-  }
-  
-  .events-desktop .img {
-    position: relative;
-    width: 85px;
-    height: 83px;
-    object-fit: cover;
-  }
-  
-  .events-desktop .div {
-    flex: 1;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 20px;
-    position: relative;
-  }
-  
-  .events-desktop .event-title-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-    position: relative;
-    align-self: stretch;
-    width: 100%;
-    flex: 0 0 auto;
-  }
-  
-  .events-desktop .event-title {
-    position: relative;
-    align-self: stretch;
-    margin-top: -1.00px;
-    font-family: "Inter-Bold", Helvetica;
-    font-weight: 700;
-    color: #031749;
-    font-size: 20px;
-    letter-spacing: 0;
-    line-height: 28.0px;
-  }
-  
-  .events-desktop .info {
-    display: flex;
-    height: 32px;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    align-self: stretch;
-    width: 100%;
-  }
-  
-  .events-desktop .text-wrapper-2 {
-    position: relative;
-    width: fit-content;
-    font-family: "Inter-Regular", Helvetica;
-    font-weight: 500;
-    color: #031749;
-    font-size: 14px;
-    letter-spacing: 0;
-    line-height: 21px;
-    white-space: nowrap;
-  }
 
-
-  
-  .events-desktop .frame-2 {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-    position: relative;
-    flex: 0 0 auto;
-  }
-  
-  .events-desktop .tag {
-    display: inline-flex;
-    height: 31px;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px;
-    position: relative;
-    flex: 0 0 auto;
-    border-radius: 4px;
-  }
-  
-  .events-desktop .element-seats-left {
-    position: relative;
-    width: fit-content;
-    margin-top: -6.00px;
-    margin-bottom: -4.00px;
-    font-family: "Inter-SemiBold", Helvetica;
-    font-weight: 600;
-    color: #031749;
-    font-size: 14px;
-    letter-spacing: 0;
-    line-height: 21px;
-    white-space: nowrap;
-    cursor: pointer; 
-    transition: transform 0.1s ease-in-out, text-decoration 0.2s ease-in-out;
-  }
-
-.events-desktop .element-seats-left:hover {
-    transform: scale(1.1); /* Hace que crezca un poco */
-    text-decoration: underline; /* Agrega una línea debajo */
-}
-  
-.container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.logo {
-    width: 15%; /* Ajusta el tamaño según sea necesario */
-    height: auto;
-    margin-left: 10px; /* Espaciado entre el botón y la imagen */
-    vertical-align: middle; /* Alinear verticalmente con el botón */
-}
 
 #registerMessage {
     margin-top: 10px;
@@ -287,75 +302,10 @@ body, html {
     text-decoration: underline;
 }
 
-.sidebar {
-    height: 100%; /* Full-height: always stays full-height */
-    width: 0; /* Initial width of 0 for the sidebar */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Stay on top */
-    top: 0;
-    z-index: 1100;
-    left: 0;
-    background-color: #031749; /* Color of the sidebar */
-    overflow-x: hidden; /* Disable horizontal scroll */
-    transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
-    padding-top: 60px; /* Place content 60px from the top */
-}
-
-.sidebar a {
-    padding: 10px 15px;
-    text-decoration: none;
-    font-size: 25px;
-    color: white;
-    display: block;
-    transition: 0.3s;
-}
-
-.sidebar a:hover {
-    color: #f1f1f1;
-}
-
-.sidebar .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-}
-
 h1 {
     margin-left: 10px;
     font-size: 3.5rem;
     margin-top: 0; 
-}
-
-
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    flex-wrap: nowrap;
-}
-
-.menu {
-    background: none;
-    border: none;
-    font-size: 35px;
-    font-size: 2.4rem;
-    cursor: pointer;
-    color: #031749; /* Icono del menú en blanco para contraste */
-}
-
-.btn {
-    padding: 15px 50px;
-    background-color: #031749;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-size: 1.15rem;
-    margin: 20px;
-    width: fit-content;
-    cursor: pointer;
 }
 
 .horizontal-container {
@@ -492,7 +442,7 @@ header {
 .card {
     display: flex;
     justify-content: flex-end; /* Envía los íconos a la derecha */
-    height: 70px;
+    height: 95%;
     width: 100%; /* Asegura que ocupe todo el ancho del contenedor */
     max-width: 350px; /* Máximo ancho del contenedor de los íconos */
     margin: 0 right; /* Centra la tarjeta dentro del footer */
@@ -562,7 +512,7 @@ header {
 }
 
 footer {
-    padding: 30px;
+    padding: 20px;
     background-color: #80849c; /* Fondo del pie de página */
     margin-top: auto; /* Empuja el footer al final */
     display: flex;
@@ -580,17 +530,13 @@ footer {
 .social-icons {
     display: flex; /* Asegura que los iconos se alineen en fila */
     color: #031749; /* Color de los enlaces en el pie de página para contraste */
-    padding: 20px;
+    padding: 13px;
     text-decoration: none;
     width: 100%;
     justify-content: flex-end;
     background-color: white; /* Elimina el subrayado de los enlaces */
+
 }
-
-
-
-
-
 
 .auth-buttons {
     margin-left: auto;
@@ -616,13 +562,10 @@ footer {
     display: inline-block; /* Asegura que el botón no ocupe el ancho completo */
 }
 
-
 .btn.inverted:hover {
     background-color: #031749;
     color: white;
 }
-
-
 
 .welcome-message {
     font-size: 1rem; /* Tamaño de la fuente */
@@ -638,14 +581,13 @@ footer {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    padding: 10px; /* Añadir padding para asegurar espacio en pantallas pequeñas */
 }
 
 .popup-content {
@@ -763,8 +705,6 @@ footer {
     cursor: pointer;
 }
 
-
-
 /* Ajustes generales para pantallas pequeñas */
 @media only screen and (max-width: 768px) {
     .container {
@@ -775,7 +715,6 @@ footer {
         font-size: 2rem;
         text-align: center;
     }
-
 
     header {
         width: 100%; /* Ocupa todo el ancho */
@@ -818,13 +757,12 @@ footer {
         box-sizing: border-box; /* Asegura que padding no afecte el tamaño total */
     }
     
-    
-
     .auth-buttons {
         display: flex;
         align-items: center; /* Alinea verticalmente en el centro */
         margin: 0; /* Elimina cualquier margen */
-        padding: 0
+        padding: 0;
+        gap: 0.5%;
     }
     
     .btn.inverted {
@@ -839,7 +777,6 @@ footer {
         width: fit-content; /* Ajusta automáticamente al tamaño del contenido */
     }
     
-
     .btn.inverted img {
         margin-right: 5px; /* Espacio entre el ícono y el texto */
         width: 20px; /* Ajusta el tamaño del ícono */
@@ -854,13 +791,13 @@ footer {
         max-width: 100%; /* Evita que la imagen se salga del contenedor */
         display: block; /* Elimina cualquier espacio extra generado por elementos inline */
         margin: 0 auto; /* Centra la imagen si hay espacio disponible */
+        
     }
 
     .welcome-message {
         font-size: 0.60rem;
         margin: 0; /* Elimina cualquier margen */
         padding: 0
-        
     }
     .horizontal-container {
         flex-direction: column;
@@ -906,7 +843,7 @@ footer {
     .footer-message {
         font-size: 0.65rem; /* Ajusta el tamaño del texto en pantallas pequeñas */
         max-width: 100%; /* Permite que el mensaje ocupe todo el ancho si es necesario */
-        margin-bottom: 10px; /* Espacio inferior para separación */
+/* Espacio inferior para separación */
         text-align: justify;
     }
     
@@ -916,6 +853,7 @@ footer {
         align-items: center;
         flex-wrap: wrap; /* Permite que los íconos se muevan a la siguiente línea si es necesario */
         margin-top: 0; 
+        padding: 1%;
     }
     
     .card {
@@ -924,6 +862,7 @@ footer {
         align-items: center;
         width: 100%;
         max-width: 500px;
+        max-height: fit-content;
         margin: 0 auto;
     }
     
