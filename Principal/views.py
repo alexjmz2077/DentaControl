@@ -17,6 +17,10 @@ from googleapiclient.discovery import build
 from django.conf import settings
 import os
 from oauthlib.oauth2.rfc6749.errors import InsecureTransportError
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import PacienteSerializer
 
 def validar_cedula(request):
     if request.method == 'GET':
@@ -477,3 +481,61 @@ def google_auth(request):
         return JsonResponse({
             'error': str(e)
         }, status=500)
+#API PARA N8N
+@api_view(['POST'])
+def crear_paciente_api(request):
+    """
+    Endpoint para crear un nuevo paciente vía API
+    """
+    try:
+        serializer = PacienteSerializer(data=request.data)
+        if serializer.is_valid():
+            # Verificar si ya existe un paciente con esta cédula
+            cedula = serializer.validated_data.get('cedula')
+            if Paciente.objects.filter(cedula=cedula).exists():
+                return Response(
+                    {'error': 'Ya existe un paciente con esta cédula'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Guardar el nuevo paciente
+            serializer.save()
+            return Response({
+                'success': True,
+                'message': 'Paciente creado exitosamente',
+                'data': serializer.data
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response({
+            'success': False,
+            'error': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def obtener_paciente_api(request, cedula):
+    """
+    Endpoint para obtener un paciente por su cédula
+    """
+    try:
+        paciente = Paciente.objects.get(cedula=cedula)
+        serializer = PacienteSerializer(paciente)
+        return Response({
+            'success': True,
+            'data': serializer.data
+        })
+    except Paciente.DoesNotExist:
+        return Response({
+            'success': False,
+            'error': 'Paciente no encontrado'
+        }, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from Principal import views
 from django.contrib.auth import views as auth_views
+from Principal.views import crear_paciente_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,4 +40,7 @@ urlpatterns = [
     path('eliminar_cita/<str:id>/', views.eliminar_cita, name='eliminar_cita'),
     path('oauth2callback/', views.oauth2callback, name='oauth2callback'),
     path('google_auth/', views.google_auth, name='google_auth'),
+    
+    path('api/pacientes/', crear_paciente_api, name='api_crear_paciente'),
+    path('api/pacientes/<str:cedula>/', views.obtener_paciente_api, name='api_obtener_paciente'),
 ]
