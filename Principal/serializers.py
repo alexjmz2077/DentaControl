@@ -4,8 +4,9 @@ from .models import Paciente
 class PacienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paciente
-        fields = ['cedula', 'nombres', 'apellidos', 'fecha_nacimiento', 
-                 'telefono', 'direccion', 'correo']
+        fields =  ['id', 'cedula', 'nombres', 'apellidos', 'fecha_nacimiento',
+                 'telefono', 'direccion', 'correo', 'sexo', 'discapacidad',
+                 'orientacion_sexual', 'grupo_sanguineo']
 
     def validate_cedula(self, value):
         # Validar que la cédula tenga 10 dígitos

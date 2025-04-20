@@ -1,14 +1,40 @@
 from django.db import models
 
 class Paciente(models.Model):
+    SEXO_CHOICES = [
+        ('Masculino', 'Masculino'),
+        ('Femenino', 'Femenino'),
+        ('Sin especificar', 'Sin especificar')
+    ]
+    GRUPO_SANGUINEO_CHOICES = [
+        ('A+', 'A+'),
+        ('A-', 'A-'),
+        ('B+', 'B+'),
+        ('B-', 'B-'),
+        ('AB+', 'AB+'),
+        ('AB-', 'AB-'),
+        ('O+', 'O+'),
+        ('O-', 'O-')
+    ]
+    ORIENTACION_SEXUAL_CHOICES = [
+        ('Heterosexual', 'Heterosexual'),
+        ('Homosexual', 'Homosexual'),
+        ('Bisexual', 'Bisexual'),
+        ('Otro', 'Otro')
+    ]
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
-    cedula = models.CharField(max_length=10, unique=True)  # Para Ecuador
+    cedula = models.CharField(max_length=10, unique=True)
     fecha_nacimiento = models.DateField()
     telefono = models.CharField(max_length=15, blank=True, null=True)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     correo = models.EmailField(blank=True, null=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    # Nuevos campos
+    sexo = models.CharField(max_length=20, choices=SEXO_CHOICES, default='Sin especificar')
+    discapacidad = models.BooleanField(default=False)
+    orientacion_sexual = models.CharField(max_length=50, blank=True, null=True, choices=ORIENTACION_SEXUAL_CHOICES, default='Otro')
+    grupo_sanguineo = models.CharField(max_length=3, choices=GRUPO_SANGUINEO_CHOICES, default='O+')
 
     def __str__(self):
         return f"{self.nombres} {self.apellidos}"

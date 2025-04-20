@@ -8,27 +8,12 @@
     <title>DentaControl</title>
 
     <!-- Custom JS -->
-    <script src="{% static 'js/cita.js' %}" defer></script>
+    <script src="{% static 'js/historial.js' %}" defer></script>
     <script src="{% static 'js/general.js' %}" defer></script>
 
 
-    <link rel="stylesheet" href="{% static 'css/styles_cita.css' %}">
+    <link rel="stylesheet" href="{% static 'css/historial.css' %}">
     <link rel="stylesheet" href="{% static 'css/general.css' %}">
-
-    
-    <!-- FullCalendar CSS -->
-
-    <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/main.min.css' rel='stylesheet' />
-    <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/main.min.css' rel='stylesheet' />
-    <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/main.min.css' rel='stylesheet' />
-     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/es.global.min.js'></script>
-
-    <!-- FullCalendar JS -->
-    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js'></script>
-     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/es.global.min.js'></script>    
     
     
 
@@ -43,7 +28,7 @@
         const urlCitas = "{% url 'citas' %}";
         const urlHistorial = "{% url 'historial' %}";
         const nombreUsuario = "{{ user.first_name }} {{ user.last_name }}";
-        const urlGoogleAuth = "{% url 'google_auth' %}";
+
     </script>
 </head>
 <body>
@@ -78,48 +63,100 @@
         </header>
 
         <main>
-            <div id="calendar"></div>
-            
-            <div id="gcal-auth" style="display: none;" class="calendar-auth-overlay">
-                <div class="calendar-auth-content">
-                    <h2>Conectar con Google Calendar</h2>
-                    <p>Para administrar las citas, necesita conectarse a Google Calendar.</p>
-                    <button class="btn google-auth-btn" onclick="window.location.href= urlGoogleAuth">
-                        <img src="{% static 'img/google-calendar.png' %}" alt="Google Calendar" class="button-icon">
-                        Conectar con Google Calendar
-                    </button>
+            <div class="historial-container">
+                <h1>Historial Médico</h1>
+                <p class="description">Accede a tu historial médico dental de forma rápida y segura.</p>
+
+                <!-- Sección de búsqueda -->
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" 
+                               id="cedulaSearch" 
+                               placeholder="Buscar por cédula..." 
+                               maxlength="10" 
+                               pattern="\d*">
+                        <button onclick="buscarPaciente()">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Información del paciente (inicialmente oculta) -->
+                <div id="pacienteInfo" class="patient-info" style="display: none;">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Nombres:</label>
+                            <span id="nombresPaciente">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Fecha Nacimiento:</label>
+                            <span id="fechaNacimiento">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Edad:</label>
+                            <span id="edadPaciente">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Sexo:</label>
+                            <span id="sexoPaciente">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Discapacidad:</label>
+                            <span id="discapacidadPaciente">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Orientación Sexual:</label>
+                            <span id="orientacionPaciente">-</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Grupo Sanguíneo:</label>
+                            <span id="grupoSanguineoPaciente">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mega menú (inicialmente oculto) -->
+                <div id="megaMenu" class="mega-menu" style="display: none;">
+                    <nav class="tabs">
+                        <button class="tab-btn active" data-tab="antecedentes">
+                            🏥 Antecedentes
+                        </button>
+                        <button class="tab-btn" data-tab="motivo">
+                            📋 Motivo de Consulta
+                        </button>
+                        <button class="tab-btn" data-tab="signos">
+                            💓 Signos Vitales
+                        </button>
+                        <button class="tab-btn" data-tab="odontograma">
+                            🦷 Odontograma
+                        </button>
+                        <button class="tab-btn" data-tab="periodoncia">
+                            🔍 Periodoncia
+                        </button>
+                        <button class="tab-btn" data-tab="tratamiento">
+                            💊 Tratamiento
+                        </button>
+                        <button class="tab-btn" data-tab="evolucion">
+                            📈 Evolución
+                        </button>
+                    </nav>
+
+                    <!-- Contenido de las pestañas -->
+                    <div class="tab-content">
+                        <div id="antecedentes" class="tab-pane active">
+                            <!-- Contenido de Antecedentes -->
+                        </div>
+                        <div id="motivo" class="tab-pane">
+                            <!-- Contenido de Motivo de Consulta -->
+                        </div>
+                        <div id="signos" class="tab-pane">
+                            <!-- Contenido de Signos Vitales -->
+                        </div>
+                        <!-- ... más contenidos de pestañas ... -->
+                    </div>
                 </div>
             </div>
         </main>
-
-        <!-- Popup para agregar/editar citas -->
-        <div id="citaPopup" class="popup" style="display: none;">
-            <div class="popup-content">
-                <span class="close" onclick="closePopup('citaPopup')">&times;</span>
-                <h2 id="popupTitle">Agregar Cita</h2>
-                <form id="citaForm">
-                    <div class="form-group">
-                        <label for="paciente">Paciente</label>
-                        <select id="paciente" name="paciente" required>
-                            <option value="" disabled selected>Buscar por cédula...</option>
-                            <!-- Las opciones se cargarán dinámicamente -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="fecha_hora">Fecha y Hora</label>
-                        <input type="datetime-local" id="fecha_hora" name="fecha_hora" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="motivo">Motivo</label>
-                        <textarea id="motivo" name="motivo" required></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn" onclick="guardarCita()">Guardar</button>
-                        <button type="button" class="btn btn-danger" id="eliminarCitaBtn" style="display: none;" onclick="eliminarCita()">Eliminar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
 
         <footer>
             <div class="social-icons">

@@ -44,6 +44,9 @@ def inicio(request):
 def citas(request):
     return render(request, 'citas.html')
 
+def historial(request):
+    return render(request, 'historial.html')
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -60,17 +63,22 @@ def login_view(request):
 @login_required
 def register_view(request):
     if request.method == 'POST':
-        # Obtener los datos del formulario
-        cedula = request.POST.get('cedula')
-        nombres = request.POST.get('nombres')
-        apellidos = request.POST.get('apellidos')
-        fecha_nacimiento = request.POST.get('fecha_nacimiento')
-        telefono = request.POST.get('telefono')
-        direccion = request.POST.get('direccion')
-        correo = request.POST.get('correo')
-        
-        # Validar y guardar el paciente
         try:
+            # Obtener los datos del formulario
+            cedula = request.POST.get('cedula')
+            nombres = request.POST.get('nombres')
+            apellidos = request.POST.get('apellidos')
+            fecha_nacimiento = request.POST.get('fecha_nacimiento')
+            telefono = request.POST.get('telefono')
+            direccion = request.POST.get('direccion')
+            correo = request.POST.get('correo')
+            # Nuevos campos
+            sexo = request.POST.get('sexo')
+            discapacidad = request.POST.get('discapacidad') == 'True'
+            orientacion_sexual = request.POST.get('orientacion_sexual')
+            grupo_sanguineo = request.POST.get('grupo_sanguineo')
+            
+            # Validar y guardar el paciente
             Paciente.objects.create(
                 cedula=cedula,
                 nombres=nombres,
@@ -78,12 +86,16 @@ def register_view(request):
                 fecha_nacimiento=fecha_nacimiento,
                 telefono=telefono,
                 direccion=direccion,
-                correo=correo
+                correo=correo,
+                # Nuevos campos
+                sexo=sexo,
+                discapacidad=discapacidad,
+                orientacion_sexual=orientacion_sexual,
+                grupo_sanguineo=grupo_sanguineo
             )
             request.session['register_success'] = True
             return redirect('inicio')
         except Exception as e:
-            # Manejar errores (por ejemplo, cédula duplicada)
             request.session['register_error'] = str(e)
             return redirect('inicio')
 
@@ -519,16 +531,25 @@ def crear_paciente_api(request):
 
 @api_view(['GET'])
 def obtener_paciente_api(request, cedula):
-    """
-    Endpoint para obtener un paciente por su cédula
-    """
     try:
         paciente = Paciente.objects.get(cedula=cedula)
-        serializer = PacienteSerializer(paciente)
-        return Response({
+        data = {
             'success': True,
-            'data': serializer.data
-        })
+            'data': {
+                'nombres': paciente.nombres,
+                'apellidos': paciente.apellidos,
+                'cedula': paciente.cedula,
+                'fecha_nacimiento': paciente.fecha_nacimiento,
+                'telefono': paciente.telefono,
+                'direccion': paciente.direccion,
+                'correo': paciente.correo,
+                'sexo': paciente.sexo,
+                'discapacidad': paciente.discapacidad,
+                'orientacion_sexual': paciente.orientacion_sexual,
+                'grupo_sanguineo': paciente.grupo_sanguineo
+            }
+        }
+        return Response(data)
     except Paciente.DoesNotExist:
         return Response({
             'success': False,

@@ -1,5 +1,3 @@
-
-
 setTimeout(() => {
     closePopup('successPopup');
 }, 3000);
@@ -254,6 +252,10 @@ function cargarPacientes(filtro = '') {
                     <td contenteditable="true" data-field="nombres" data-id="${paciente.id}">${paciente.nombres}</td>
                     <td contenteditable="true" data-field="apellidos" data-id="${paciente.id}">${paciente.apellidos}</td>
                     <td contenteditable="true" data-field="fecha_nacimiento" data-id="${paciente.id}">${paciente.fecha_nacimiento}</td>
+                    <td contenteditable="true" data-field="sexo" data-id="${paciente.id}">${paciente.sexo}</td>
+                    <td contenteditable="true" data-field="discapacidad" data-id="${paciente.id}">${paciente.discapacidad ? 'Sí' : 'No'}</td>
+                    <td contenteditable="true" data-field="orientacion_sexual" data-id="${paciente.id}">${paciente.orientacion_sexual || ''}</td>
+                    <td contenteditable="true" data-field="grupo_sanguineo" data-id="${paciente.id}">${paciente.grupo_sanguineo}</td>
                     <td contenteditable="true" data-field="telefono" data-id="${paciente.id}">${paciente.telefono || ''}</td>
                     <td contenteditable="true" data-field="direccion" data-id="${paciente.id}">${paciente.direccion || ''}</td>
                     <td contenteditable="true" data-field="correo" data-id="${paciente.id}">${paciente.correo || ''}</td>
@@ -274,7 +276,11 @@ function guardarCambios(id, row) {
         fecha_nacimiento: row.querySelector('[data-field="fecha_nacimiento"]').textContent,
         telefono: row.querySelector('[data-field="telefono"]').textContent,
         direccion: row.querySelector('[data-field="direccion"]').textContent,
-        correo: row.querySelector('[data-field="correo"]').textContent
+        correo: row.querySelector('[data-field="correo"]').textContent,
+        sexo: row.querySelector('[data-field="sexo"]').textContent,
+        discapacidad: row.querySelector('[data-field="discapacidad"]').textContent === 'Sí',
+        orientacion_sexual: row.querySelector('[data-field="orientacion_sexual"]').textContent,
+        grupo_sanguineo: row.querySelector('[data-field="grupo_sanguineo"]').textContent
     };
 
     fetch(`/actualizar_paciente/${id}/`, {
@@ -311,17 +317,24 @@ function getCookie(name) {
 }
 
 function confirmarEliminar(id) {
+    // Eliminar popup anterior si existe
+    const existingPopup = document.getElementById('confirmDeletePopup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
     const popup = document.createElement('div');
     popup.className = 'popup';
-    popup.id = 'confirmDeletePopup'; // Agregamos un ID específico
+    popup.id = 'confirmDeletePopup';
     popup.style.display = 'flex';
     popup.innerHTML = `
         <div class="popup-content">
+            <span class="close" onclick="closePopup('confirmDeletePopup')">&times;</span>
             <h2>Confirmar eliminación</h2>
             <p>¿Estás seguro de eliminar la información del paciente?</p>
             <div class="popup-buttons">
                 <button class="btn" onclick="eliminarPaciente(${id})">Sí</button>
-                <button class="btn inverted" onclick="closePopup('confirmDeletePopup')">No</button>
+                <button class="btn inverted" onclick="cerrarPopupEliminar()">No</button>
             </div>
         </div>
     `;
@@ -340,12 +353,26 @@ function eliminarPaciente(id) {
     .then(data => {
         if (data.success) {
             cargarPacientes(); // Recargar la tabla
+            cerrarPopupEliminar(); // Usar la nueva función
             alert('Paciente eliminado correctamente');
-            closePopup('confirmDeletePopup'); // Usamos la función closePopup existente
         } else {
             alert('Error al eliminar el paciente');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al eliminar el paciente');
+    })
+    .finally(() => {
+        cerrarPopupEliminar(); // Asegurarnos de que el popup se cierre incluso si hay un error
     });
+}
+
+function cerrarPopupEliminar() {
+    const popup = document.getElementById('confirmDeletePopup');
+    if (popup) {
+        popup.remove(); // Eliminamos el elemento del DOM en lugar de solo ocultarlo
+    }
 }
 
 // Agregar evento cuando el DOM esté cargado
@@ -370,6 +397,21 @@ document.addEventListener('DOMContentLoaded', function() {
         content.addEventListener('click', function(event) {
             event.stopPropagation();
         });
+    });
+
+    // Añadir listener para la tecla Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            cerrarPopupEliminar();
+        }
+    });
+
+    // Añadir listener para clicks fuera del popup
+    document.addEventListener('click', function(event) {
+        const popup = document.getElementById('confirmDeletePopup');
+        if (popup && !popup.querySelector('.popup-content').contains(event.target)) {
+            cerrarPopupEliminar();
+        }
     });
 });
 

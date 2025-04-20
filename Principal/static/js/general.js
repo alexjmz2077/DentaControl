@@ -7,6 +7,10 @@ function Citas() {
     window.location.href = urlCitas;
 }
 
+function Historial() {
+    window.location.href = urlHistorial;
+}
+
 function showLoginMessage() {
     alert('Por favor, inicia sesión para acceder a esta funcionalidad.');
 }
