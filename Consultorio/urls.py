@@ -44,4 +44,8 @@ urlpatterns = [
     
     path('api/pacientes/', crear_paciente_api, name='api_crear_paciente'),
     path('api/pacientes/<str:cedula>/', views.obtener_paciente_api, name='api_obtener_paciente'),
+
+
+    path('api/antecedentes/<str:cedula>/', views.obtener_antecedentes, name='obtener_antecedentes'),
+    path('api/guardar_antecedentes/', views.guardar_antecedentes, name='guardar_antecedentes'),
 ]

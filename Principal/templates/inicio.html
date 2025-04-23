@@ -32,6 +32,7 @@
             <a onclick="Historial()" class="sidebar_menu">Historial</a>
         {% else %}
         <a onclick="showLoginMessage()" class="sidebar_menu">Citas</a>
+        <a onclick="showLoginMessage()" class="sidebar_menu">Historial</a>
         {% endif %}
     </div>
     <div class="container">
@@ -166,6 +167,7 @@
                                 <option value="AB-">AB-</option>
                                 <option value="O+">O+</option>
                                 <option value="O-">O-</option>
+                                <option value="No sabe">No sabe</option>
                             </select>
                             
                             <button type="submit" class="btn">Registrar</button>
@@ -204,7 +206,11 @@
                       <div class="info">
                         <p class="text-wrapper-2">Accede al historial clínico completo de tus pacientes.</p> <!-- Descripcion del evento-->
                         <div class="frame-2">
-                            <div class="tag"><div class="element-seats-left" onclick="Historial()">Ver Historial</div></div><!-- Registrar un nuevo evento -->
+                            {% if user.is_authenticated %}
+                            <div class="tag"><div class="element-seats-left" onclick="Historial()">Ver Historial</div></div>
+                            {% else %}
+                            <div class="tag" ><div class="element-seats-left" onclick="showLoginMessage()" >Ver Historial</div></div>
+                            {% endif %}
                         </div>
                       </div>
                     </div>

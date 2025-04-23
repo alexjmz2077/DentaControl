@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Paciente, Cita
+from .models import Paciente, Antecedentes
 from django.http import JsonResponse
 from django.db.models import Q
 import json
@@ -560,3 +560,63 @@ def obtener_paciente_api(request, cedula):
             'success': False,
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@login_required
+def obtener_antecedentes(request, cedula):
+    try:
+        paciente = Paciente.objects.get(cedula=cedula)
+        antecedentes = Antecedentes.objects.filter(paciente=paciente).first()
+        
+        if antecedentes:
+            data = {
+                'alergia_alimentos': antecedentes.alergia_alimentos,
+                'alergia_alimentos_detalle': antecedentes.alergia_alimentos_detalle,
+                'alergia_medicamentos': antecedentes.alergia_medicamentos,
+                'alergia_medicamentos_detalle': antecedentes.alergia_medicamentos_detalle,
+                'alergia_otros': antecedentes.alergia_otros,
+                'alergia_otros_detalle': antecedentes.alergia_otros_detalle,
+                'cancer': antecedentes.cancer,
+                'diabetes': antecedentes.diabetes,
+                'vih': antecedentes.vih,
+                'tabaquismo': antecedentes.tabaquismo,
+                'tabaquismo_detalle': antecedentes.tabaquismo_detalle,
+                'alcoholismo': antecedentes.alcoholismo,
+                'alcoholismo_detalle': antecedentes.alcoholismo_detalle,
+                'dieta_alta_azucares': antecedentes.dieta_alta_azucares,
+                'cepillado': antecedentes.cepillado,
+                'hilo_dental': antecedentes.hilo_dental,
+                'enjuague': antecedentes.enjuague,
+                'fecha_actualizacion': antecedentes.fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S') if antecedentes.fecha_actualizacion else None
+            }
+            return JsonResponse({'success': True, 'data': data})
+        return JsonResponse({'success': True, 'data': None})
+    except Paciente.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@csrf_exempt
+def guardar_antecedentes(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cedula = data.get('cedula')
+            paciente = Paciente.objects.get(cedula=cedula)
+            
+            antecedentes, created = Antecedentes.objects.get_or_create(paciente=paciente)
+            
+            # Actualizar campos
+            for field, value in data.items():
+                if hasattr(antecedentes, field):
+                    setattr(antecedentes, field, value)
+            
+            antecedentes.save()
+            return JsonResponse({'success': True})
+            
+        except Paciente.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})

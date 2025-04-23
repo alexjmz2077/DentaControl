@@ -251,11 +251,46 @@ function cargarPacientes(filtro = '') {
                     <td>${paciente.cedula}</td>
                     <td contenteditable="true" data-field="nombres" data-id="${paciente.id}">${paciente.nombres}</td>
                     <td contenteditable="true" data-field="apellidos" data-id="${paciente.id}">${paciente.apellidos}</td>
-                    <td contenteditable="true" data-field="fecha_nacimiento" data-id="${paciente.id}">${paciente.fecha_nacimiento}</td>
-                    <td contenteditable="true" data-field="sexo" data-id="${paciente.id}">${paciente.sexo}</td>
-                    <td contenteditable="true" data-field="discapacidad" data-id="${paciente.id}">${paciente.discapacidad ? 'Sí' : 'No'}</td>
-                    <td contenteditable="true" data-field="orientacion_sexual" data-id="${paciente.id}">${paciente.orientacion_sexual || ''}</td>
-                    <td contenteditable="true" data-field="grupo_sanguineo" data-id="${paciente.id}">${paciente.grupo_sanguineo}</td>
+                    <td>
+                        <input type="date" 
+                               data-field="fecha_nacimiento" 
+                               data-id="${paciente.id}" 
+                               value="${paciente.fecha_nacimiento}">
+                    </td>
+                    <td>
+                        <select data-field="sexo" data-id="${paciente.id}">
+                            <option value="Masculino" ${paciente.sexo === 'Masculino' ? 'selected' : ''}>Masculino</option>
+                            <option value="Femenino" ${paciente.sexo === 'Femenino' ? 'selected' : ''}>Femenino</option>
+                            <option value="Sin especificar" ${paciente.sexo === 'Sin especificar' ? 'selected' : ''}>Sin especificar</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select data-field="discapacidad" data-id="${paciente.id}">
+                            <option value="false" ${!paciente.discapacidad ? 'selected' : ''}>No</option>
+                            <option value="true" ${paciente.discapacidad ? 'selected' : ''}>Sí</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select data-field="orientacion_sexual" data-id="${paciente.id}">
+                            <option value="Heterosexual" ${paciente.orientacion_sexual === 'Heterosexual' ? 'selected' : ''}>Heterosexual</option>
+                            <option value="Homosexual" ${paciente.orientacion_sexual === 'Homosexual' ? 'selected' : ''}>Homosexual</option>
+                            <option value="Bisexual" ${paciente.orientacion_sexual === 'Bisexual' ? 'selected' : ''}>Bisexual</option>
+                            <option value="Otro" ${paciente.orientacion_sexual === 'Otro' ? 'selected' : ''}>Otro</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select data-field="grupo_sanguineo" data-id="${paciente.id}">
+                            <option value="A+" ${paciente.grupo_sanguineo === 'A+' ? 'selected' : ''}>A+</option>
+                            <option value="A-" ${paciente.grupo_sanguineo === 'A-' ? 'selected' : ''}>A-</option>
+                            <option value="B+" ${paciente.grupo_sanguineo === 'B+' ? 'selected' : ''}>B+</option>
+                            <option value="B-" ${paciente.grupo_sanguineo === 'B-' ? 'selected' : ''}>B-</option>
+                            <option value="AB+" ${paciente.grupo_sanguineo === 'AB+' ? 'selected' : ''}>AB+</option>
+                            <option value="AB-" ${paciente.grupo_sanguineo === 'AB-' ? 'selected' : ''}>AB-</option>
+                            <option value="O+" ${paciente.grupo_sanguineo === 'O+' ? 'selected' : ''}>O+</option>
+                            <option value="O-" ${paciente.grupo_sanguineo === 'O-' ? 'selected' : ''}>O-</option>
+                            <option value="No sabe" ${paciente.grupo_sanguineo === 'No sabe' ? 'selected' : ''}>No sabe</option>
+                        </select>
+                    </td>
                     <td contenteditable="true" data-field="telefono" data-id="${paciente.id}">${paciente.telefono || ''}</td>
                     <td contenteditable="true" data-field="direccion" data-id="${paciente.id}">${paciente.direccion || ''}</td>
                     <td contenteditable="true" data-field="correo" data-id="${paciente.id}">${paciente.correo || ''}</td>
@@ -269,18 +304,19 @@ function cargarPacientes(filtro = '') {
         });
 }
 
+
 function guardarCambios(id, row) {
     const datos = {
         nombres: row.querySelector('[data-field="nombres"]').textContent,
         apellidos: row.querySelector('[data-field="apellidos"]').textContent,
-        fecha_nacimiento: row.querySelector('[data-field="fecha_nacimiento"]').textContent,
+        fecha_nacimiento: row.querySelector('[data-field="fecha_nacimiento"]').value,
         telefono: row.querySelector('[data-field="telefono"]').textContent,
         direccion: row.querySelector('[data-field="direccion"]').textContent,
         correo: row.querySelector('[data-field="correo"]').textContent,
-        sexo: row.querySelector('[data-field="sexo"]').textContent,
-        discapacidad: row.querySelector('[data-field="discapacidad"]').textContent === 'Sí',
-        orientacion_sexual: row.querySelector('[data-field="orientacion_sexual"]').textContent,
-        grupo_sanguineo: row.querySelector('[data-field="grupo_sanguineo"]').textContent
+        sexo: row.querySelector('[data-field="sexo"]').value,
+        discapacidad: row.querySelector('[data-field="discapacidad"]').value === 'true',
+        orientacion_sexual: row.querySelector('[data-field="orientacion_sexual"]').value,
+        grupo_sanguineo: row.querySelector('[data-field="grupo_sanguineo"]').value
     };
 
     fetch(`/actualizar_paciente/${id}/`, {
@@ -294,7 +330,11 @@ function guardarCambios(id, row) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Datos actualizados correctamente');
+            const notification = document.createElement('div');
+            notification.className = 'save-notification';
+            notification.textContent = 'Cambios guardados';
+            row.querySelector('.action-buttons').appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
         } else {
             alert('Error al actualizar los datos');
         }

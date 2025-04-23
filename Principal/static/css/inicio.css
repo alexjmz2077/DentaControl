@@ -228,6 +228,52 @@
     cursor: pointer;
 }
 
+/* Estilos para los selects y date en la tabla */
+#tablaPacientes select, 
+#tablaPacientes input[type="date"] {
+    width: 95%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+#tablaPacientes select:hover,
+#tablaPacientes input[type="date"]:hover {
+    border-color: #031749;
+}
+
+#tablaPacientes select:focus,
+#tablaPacientes input[type="date"]:focus {
+    outline: none;
+    border-color: #031749;
+    box-shadow: 0 0 3px rgba(3, 23, 73, 0.2);
+}
+
+/* Notificación de guardado */
+.save-notification {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    animation: fadeOut 4s forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Asegurar que las celdas de la tabla tengan posición relativa para la notificación */
+#tablaPacientes td {
+    position: relative;
+}
+
 .filtros {
     margin: 20px 0;
     display: flex;

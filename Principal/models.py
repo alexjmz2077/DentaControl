@@ -14,7 +14,8 @@ class Paciente(models.Model):
         ('AB+', 'AB+'),
         ('AB-', 'AB-'),
         ('O+', 'O+'),
-        ('O-', 'O-')
+        ('O-', 'O-'),
+        ('No sabe', 'No sabe')
     ]
     ORIENTACION_SEXUAL_CHOICES = [
         ('Heterosexual', 'Heterosexual'),
@@ -34,61 +35,40 @@ class Paciente(models.Model):
     sexo = models.CharField(max_length=20, choices=SEXO_CHOICES, default='Sin especificar')
     discapacidad = models.BooleanField(default=False)
     orientacion_sexual = models.CharField(max_length=50, blank=True, null=True, choices=ORIENTACION_SEXUAL_CHOICES, default='Otro')
-    grupo_sanguineo = models.CharField(max_length=3, choices=GRUPO_SANGUINEO_CHOICES, default='O+')
+    grupo_sanguineo = models.CharField(max_length=15, choices=GRUPO_SANGUINEO_CHOICES, default='O+')
 
     def __str__(self):
         return f"{self.nombres} {self.apellidos}"
 
-class Cita(models.Model):
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    fecha_hora = models.DateTimeField()
-    motivo = models.TextField()
-    estado = models.CharField(
-        max_length=20, 
-        choices=[('Pendiente', 'Pendiente'), ('Confirmada', 'Confirmada'), 
-                ('Cancelada', 'Cancelada'), ('Completada', 'Completada')],
-        default='Pendiente'
-    )
-    google_event_id = models.CharField(max_length=255, blank=True, null=True)  # Nuevo campo
-
-    def __str__(self):
-        return f"Cita con {self.paciente.nombres} {self.paciente.apellidos} - {self.fecha_hora}"
-
-class Tratamiento(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField()
-    costo_total = models.DecimalField(max_digits=10, decimal_places=2)
-    requiere_pagos_parciales = models.BooleanField(default=False)  # Define si el tratamiento se paga en cuotas
-
-    def __str__(self):
-        return self.nombre
-
-class HistoriaClinica(models.Model):
-    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now_add=True)
-    notas = models.TextField()
+class Antecedentes(models.Model):
+    paciente = models.OneToOneField(Paciente, on_delete=models.CASCADE)
+    # Alergias
+    alergia_alimentos = models.BooleanField(default=False)
+    alergia_alimentos_detalle = models.TextField(blank=True, null=True)
+    alergia_medicamentos = models.BooleanField(default=False)
+    alergia_medicamentos_detalle = models.TextField(blank=True, null=True)
+    alergia_otros = models.BooleanField(default=False)
+    alergia_otros_detalle = models.TextField(blank=True, null=True)
     
-    def __str__(self):
-        return f"Historia clínica de {self.paciente} - {self.fecha}"
-
-class TratamientoPaciente(models.Model):
-    historia_clinica = models.ForeignKey(HistoriaClinica, on_delete=models.CASCADE)  # Se agrega esta clave foránea
-    tratamiento = models.ForeignKey(Tratamiento, on_delete=models.CASCADE)
-    fecha_inicio = models.DateField(auto_now_add=True)
-    saldo_pendiente = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Controla cuánto falta por pagar
-
-    def __str__(self):
-        return f"{self.historia_clinica.paciente} - {self.tratamiento} (Saldo: {self.saldo_pendiente})"
-
-class PagoTratamiento(models.Model):
-    tratamiento_paciente = models.ForeignKey(TratamientoPaciente, on_delete=models.CASCADE)
-    fecha = models.DateTimeField(auto_now_add=True)
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    metodo_pago = models.CharField(
-        max_length=20, 
-        choices=[('Efectivo', 'Efectivo'), ('Tarjeta', 'Tarjeta'), ('Transferencia', 'Transferencia')],
-        default='Efectivo'
-    )
+    # Enfermedades Sistémicas
+    cancer = models.BooleanField(default=False)
+    diabetes = models.BooleanField(default=False)
+    vih = models.BooleanField(default=False)
+    
+    # Hábitos
+    tabaquismo = models.BooleanField(default=False)
+    tabaquismo_detalle = models.TextField(blank=True, null=True)
+    alcoholismo = models.BooleanField(default=False)
+    alcoholismo_detalle = models.TextField(blank=True, null=True)
+    dieta_alta_azucares = models.BooleanField(default=False)
+    
+    # Hábitos de Higiene
+    cepillado = models.BooleanField(default=False)
+    hilo_dental = models.BooleanField(default=False)
+    enjuague = models.BooleanField(default=False)
+    
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Pago de {self.monto} para {self.tratamiento_paciente.historia_clinica.paciente} - {self.tratamiento_paciente.tratamiento}"
+        return f"Antecedentes de {self.paciente}"
+

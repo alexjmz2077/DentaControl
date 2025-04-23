@@ -144,7 +144,144 @@
                     <!-- Contenido de las pestañas -->
                     <div class="tab-content">
                         <div id="antecedentes" class="tab-pane active">
-                            <!-- Contenido de Antecedentes -->
+                            <div class="antecedentes-section">
+                                <div class="last-update">
+                                    Última Actualización: <span id="fechaActualizacion">-</span>
+                                </div>
+                                <!-- ANTECEDENTES PERSONALES -->
+                                <div class="antecedente-group">
+                                    <h2 class="section-title">PERSONALES</h2>
+                                    
+                                    <!-- Alergias -->
+                                    <div class="subsection alergias">
+                                        <h3>⚠️ Alergias</h3>
+                                        <div class="check-group">
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="alergia_alimentos" class="trigger-input">
+                                                    <span class="checkbox-text">Alimentos</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        placeholder="Especifique las alergias alimentarias..."
+                                                        rows="2"></textarea>
+                                            </div>
+
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="alergia_medicamentos" class="trigger-input">
+                                                    <span class="checkbox-text">Medicamentos</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        placeholder="Especifique las alergias a medicamentos..."
+                                                        rows="2"></textarea>
+                                            </div>
+
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="alergia_otros" class="trigger-input">
+                                                    <span class="checkbox-text">Otros</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        placeholder="Especifique otras alergias..."
+                                                        rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Enfermedades Sistémicas -->
+                                    <div class="subsection enfermedades">
+                                        <h3>🏥 Enfermedades Sistémicas</h3>
+                                        <div class="check-group">
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="cancer">
+                                                    <span class="checkbox-text">Cáncer</span>
+                                                </label>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="diabetes">
+                                                    <span class="checkbox-text">Diabetes</span>
+                                                </label>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="vih">
+                                                    <span class="checkbox-text">VIH</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modificar la sección de Hábitos y Estilo de Vida -->
+                                    <div class="subsection Habitos">
+                                        <h3>🚬🍷 Hábitos y Estilo de Vida</h3>
+                                        <div class="check-group">
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="tabaquismo" class="trigger-input">
+                                                    <span class="checkbox-text">Tabaquismo</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        placeholder="Especifique cantidad y frecuencia..."
+                                                        rows="2"></textarea>
+                                            </div>
+
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="alcoholismo" class="trigger-input">
+                                                    <span class="checkbox-text">Alcoholismo</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        placeholder="Especifique cantidad y frecuencia..."
+                                                        rows="2"></textarea>
+                                            </div>
+
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="dieta_alta_azucares">
+                                                    <span class="checkbox-text">Dieta alta en azúcares</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="section-divider">
+
+                                <!-- ANTECEDENTES ODONTOLÓGICOS -->
+                                <div class="antecedente-group">
+                                    <h2 class="section-title">ODONTOLÓGICOS</h2>
+                                    <div class="subsection habitos">
+                                        <h3>🦷 Hábitos de Higiene</h3>
+                                        <div class="check-group">
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="cepillado">
+                                                    <span class="checkbox-text">Cepillado dental (3 veces al día)</span>
+                                                </label>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="hilo_dental">
+                                                    <span class="checkbox-text">Uso de hilo dental</span>
+                                                </label>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="enjuague">
+                                                    <span class="checkbox-text">Uso de enjuague bucal</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="save-section">
+                                    <button id="guardarAntecedentes" class="btn-save" onclick="guardarAntecedentes()">
+                                        💾 Guardar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div id="motivo" class="tab-pane">
                             <!-- Contenido de Motivo de Consulta -->
@@ -152,7 +289,18 @@
                         <div id="signos" class="tab-pane">
                             <!-- Contenido de Signos Vitales -->
                         </div>
-                        <!-- ... más contenidos de pestañas ... -->
+                        <div id="odontograma" class="tab-pane">
+                            <!-- Contenido de Odontograma -->
+                        </div>
+                        <div id="periodoncia" class="tab-pane">
+                            <!-- Contenido de Periodoncia -->
+                        </div>
+                        <div id="tratamiento" class="tab-pane">
+                            <!-- Contenido de Tratamiento -->
+                        </div>
+                        <div id="evolucion" class="tab-pane">
+                            <!-- Contenido de Evolución -->
+                        </div>
                     </div>
                 </div>
             </div>
