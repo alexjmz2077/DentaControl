@@ -194,8 +194,30 @@
                                         <div class="check-group">
                                             <div class="check-item">
                                                 <label class="checkbox-label">
-                                                    <input type="checkbox" name="cancer">
-                                                    <span class="checkbox-text">Cáncer</span>
+                                                    <input type="checkbox" name="hemorragias" class="trigger-input">
+                                                    <span class="checkbox-text">Hemorragias</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        name="hemorragias_detalle"
+                                                        placeholder="Especifique detalles de las hemorragias..."
+                                                        rows="2"></textarea>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="vih">
+                                                    <span class="checkbox-text">VIH</span>
+                                                </label>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="tuberculosis">
+                                                    <span class="checkbox-text">Tuberculosis</span>
+                                                </label>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="asma">
+                                                    <span class="checkbox-text">Asma</span>
                                                 </label>
                                             </div>
                                             <div class="check-item">
@@ -206,9 +228,28 @@
                                             </div>
                                             <div class="check-item">
                                                 <label class="checkbox-label">
-                                                    <input type="checkbox" name="vih">
-                                                    <span class="checkbox-text">VIH</span>
+                                                    <input type="checkbox" name="hipertension">
+                                                    <span class="checkbox-text">Hipertensión</span>
                                                 </label>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="enfermedad_cardiaca" class="trigger-input">
+                                                    <span class="checkbox-text">Enfermedad Cardíaca</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        name="enfermedad_cardiaca_detalle"
+                                                        placeholder="Especifique detalles de la enfermedad cardíaca..."
+                                                        rows="2"></textarea>
+                                            </div>
+                                            <div class="check-item">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="otras_enfermedades" class="trigger-input">
+                                                    <span class="checkbox-text">Otros</span>
+                                                </label>
+                                                <textarea class="description-input hidden" 
+                                                        placeholder="Especifique otras enfermedades..."
+                                                        rows="2"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -284,7 +325,37 @@
                             </div>
                         </div>
                         <div id="motivo" class="tab-pane">
-                            <!-- Contenido de Motivo de Consulta -->
+                            <div class="motivo-container">
+                                <!-- Sección de ingreso de datos -->
+                                <div class="motivo-grid">
+                                    <div class="motivo-section">
+                                        <h3>Motivo de Consulta</h3>
+                                        <textarea id="motivoText" 
+                                                 class="custom-textarea" 
+                                                 placeholder="Describa el motivo de la consulta..."></textarea>
+                                    </div>
+                                    <div class="motivo-section">
+                                        <h3>Enfermedad o Problema Actual</h3>
+                                        <textarea id="problemaText" 
+                                                 class="custom-textarea" 
+                                                 placeholder="Describa la enfermedad o problema actual..."></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="save-section">
+                                    <button id="guardarMotivo" class="btn-save" onclick="guardarMotivo()">
+                                        💾 Guardar
+                                    </button>
+                                </div>
+
+                                <!-- Historial de consultas -->
+                                <div class="historial-section">
+                                    <h3>📖 Historial de Consultas</h3>
+                                    <div id="consultasAccordion" class="accordion">
+                                        <!-- El contenido se llenará dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div id="signos" class="tab-pane">
                             <!-- Contenido de Signos Vitales -->

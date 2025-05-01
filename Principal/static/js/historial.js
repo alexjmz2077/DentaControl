@@ -94,6 +94,8 @@ async function buscarPaciente() {
             if (dataAntecedentes.success && dataAntecedentes.data) {
                 mostrarAntecedentes(dataAntecedentes.data);
             }
+
+            await cargarHistorialConsultas();
         } else {
             // Si no se encuentra el paciente, limpiar la información anterior
             document.getElementById('pacienteInfo').style.display = 'none';
@@ -141,6 +143,12 @@ function formatearFecha(fecha) {
 
 function initializeAntecedentes() {
     const triggerInputs = document.querySelectorAll('.trigger-input');
+    const textareas = document.querySelectorAll('.description-input');
+    
+    // Inicializar el auto-resize para todos los textareas
+    textareas.forEach(textarea => {
+        textarea.addEventListener('input', autoResize);
+    });
     
     triggerInputs.forEach(input => {
         input.addEventListener('change', function() {
@@ -151,6 +159,8 @@ function initializeAntecedentes() {
                 if (this.checked) {
                     descriptionInput.classList.remove('hidden');
                     descriptionInput.setAttribute('required', 'required');
+                    // Ajustar altura inicial cuando se muestra
+                    autoResize.call(descriptionInput);
                 } else {
                     descriptionInput.classList.add('hidden');
                     descriptionInput.removeAttribute('required');
@@ -159,6 +169,12 @@ function initializeAntecedentes() {
             }
         });
     });
+}
+
+// Agregar la función de auto-resize
+function autoResize() {
+    this.style.height = 'auto';
+    this.style.height = this.scrollHeight + 'px';
 }
 
 function mostrarAntecedentes(antecedentes) {
@@ -192,6 +208,8 @@ function mostrarAntecedentes(antecedentes) {
             if (textarea && checkbox.checked) {
                 textarea.classList.remove('hidden');
                 textarea.value = antecedentes[fieldName + '_detalle'] || '';
+                // Ajustar altura después de establecer el valor
+                autoResize.call(textarea);
             }
         }
     });
@@ -244,4 +262,160 @@ async function guardarAntecedentes() {
         console.error('Error:', error);
         alert('Error al guardar los antecedentes');
     }
+}
+
+async function guardarMotivo() {
+    const cedula = document.getElementById('cedulaSearch').value;
+    if (!cedula) {
+        alert('Por favor, busque primero un paciente');
+        return;
+    }
+
+    const motivo = document.getElementById('motivoText').value.trim();
+    const problema = document.getElementById('problemaText').value.trim();
+
+    if (!motivo || !problema) {
+        alert('Por favor, complete ambos campos antes de guardar');
+        return;
+    }
+
+    const data = {
+        cedula: cedula,
+        motivo: motivo,
+        problema_actual: problema
+    };
+
+    try {
+        const response = await fetch('/api/guardar_motivo/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Motivo de consulta guardado exitosamente');
+            cargarHistorialConsultas();
+            // Limpiar campos
+            document.getElementById('motivoText').value = '';
+            document.getElementById('problemaText').value = '';
+        } else {
+            alert('Error al guardar: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al guardar el motivo de consulta');
+    }
+}
+
+async function cargarHistorialConsultas() {
+    const cedula = document.getElementById('cedulaSearch').value;
+    if (!cedula) return;
+
+    try {
+        const response = await fetch(`/api/consultas/${cedula}/`);
+        const data = await response.json();
+
+        if (data.success) {
+            const accordion = document.getElementById('consultasAccordion');
+            accordion.innerHTML = ''; // Limpiar contenido existente
+
+            data.consultas.forEach(consulta => {
+                const item = crearItemAccordion(consulta);
+                accordion.appendChild(item);
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function crearItemAccordion(consulta) {
+    const item = document.createElement('div');
+    item.className = 'accordion-item';
+    
+    const fecha = new Date(consulta.fecha_registro);
+    
+    const fechaFormateada = fecha.toLocaleString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    item.innerHTML = `
+        <div class="accordion-header">
+            <div class="accordion-header-content" onclick="toggleAccordion(this)">
+                <span>${fechaFormateada}</span>
+                <span class="accordion-icon">▼</span>
+            </div>
+            <img src="/static/img/delete.png" class="delete-icon" 
+                 onclick="confirmarEliminarConsulta('${consulta.id}')" 
+                 alt="Eliminar" 
+                 title="Eliminar consulta">
+        </div>
+        <div class="accordion-content">
+            <div class="content-section">
+                <h4>Motivo de Consulta:</h4>
+                <p>${consulta.motivo}</p>
+            </div>
+            <div class="content-section">
+                <h4>Enfermedad o Problema Actual:</h4>
+                <p>${consulta.problema_actual}</p>
+            </div>
+        </div>
+    `;
+
+    return item;
+}
+
+// Agregar función para confirmar eliminación
+function confirmarEliminarConsulta(consultaId) {
+    if (confirm('¿Está seguro que desea eliminar esta consulta?')) {
+        eliminarConsulta(consultaId);
+    }
+}
+
+// Agregar función para eliminar consulta
+async function eliminarConsulta(consultaId) {
+    try {
+        const response = await fetch('/api/eliminar_consulta/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                consulta_id: consultaId
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            // Recargar el historial de consultas
+            cargarHistorialConsultas();
+        } else {
+            alert('Error al eliminar: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al eliminar la consulta');
+    }
+}
+
+function toggleAccordion(headerContent) {
+    // Obtener el contenedor del accordion-content (que es el siguiente elemento después del accordion-header)
+    const content = headerContent.closest('.accordion-header').nextElementSibling;
+    const icon = headerContent.querySelector('.accordion-icon');
+    
+    // Toggle la clase active en el contenido
+    content.classList.toggle('active');
+    // Rotar el ícono según el estado
+    icon.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
 }

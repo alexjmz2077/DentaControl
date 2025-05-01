@@ -48,4 +48,7 @@ urlpatterns = [
 
     path('api/antecedentes/<str:cedula>/', views.obtener_antecedentes, name='obtener_antecedentes'),
     path('api/guardar_antecedentes/', views.guardar_antecedentes, name='guardar_antecedentes'),
+    path('api/guardar_motivo/', views.guardar_motivo, name='guardar_motivo'),
+    path('api/consultas/<str:cedula>/', views.obtener_consultas, name='obtener_consultas'),
+    path('api/eliminar_consulta/', views.eliminar_consulta, name='eliminar_consulta'),
 ]

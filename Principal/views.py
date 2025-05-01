@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Paciente, Antecedentes
+from .models import Paciente, Antecedentes, MotivoConsulta
 from django.http import JsonResponse
 from django.db.models import Q
 import json
@@ -569,23 +569,39 @@ def obtener_antecedentes(request, cedula):
         
         if antecedentes:
             data = {
+                # Alergias
                 'alergia_alimentos': antecedentes.alergia_alimentos,
                 'alergia_alimentos_detalle': antecedentes.alergia_alimentos_detalle,
                 'alergia_medicamentos': antecedentes.alergia_medicamentos,
                 'alergia_medicamentos_detalle': antecedentes.alergia_medicamentos_detalle,
                 'alergia_otros': antecedentes.alergia_otros,
                 'alergia_otros_detalle': antecedentes.alergia_otros_detalle,
-                'cancer': antecedentes.cancer,
-                'diabetes': antecedentes.diabetes,
+                
+                # Enfermedades Sistémicas
+                'hemorragias': antecedentes.hemorragias,
+                'hemorragias_detalle': antecedentes.hemorragias_detalle,
                 'vih': antecedentes.vih,
+                'tuberculosis': antecedentes.tuberculosis,
+                'asma': antecedentes.asma,
+                'diabetes': antecedentes.diabetes,
+                'hipertension': antecedentes.hipertension,
+                'enfermedad_cardiaca': antecedentes.enfermedad_cardiaca,
+                'enfermedad_cardiaca_detalle': antecedentes.enfermedad_cardiaca_detalle,
+                'otras_enfermedades': antecedentes.otras_enfermedades,
+                'otras_enfermedades_detalle': antecedentes.otras_enfermedades_detalle,
+                
+                # Hábitos
                 'tabaquismo': antecedentes.tabaquismo,
                 'tabaquismo_detalle': antecedentes.tabaquismo_detalle,
                 'alcoholismo': antecedentes.alcoholismo,
                 'alcoholismo_detalle': antecedentes.alcoholismo_detalle,
                 'dieta_alta_azucares': antecedentes.dieta_alta_azucares,
+                
+                # Hábitos de Higiene
                 'cepillado': antecedentes.cepillado,
                 'hilo_dental': antecedentes.hilo_dental,
                 'enjuague': antecedentes.enjuague,
+                
                 'fecha_actualizacion': antecedentes.fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S') if antecedentes.fecha_actualizacion else None
             }
             return JsonResponse({'success': True, 'data': data})
@@ -593,6 +609,7 @@ def obtener_antecedentes(request, cedula):
     except Paciente.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
     except Exception as e:
+        print(f"Error al obtener antecedentes: {str(e)}")  # Para debugging
         return JsonResponse({'success': False, 'error': str(e)})
 
 @login_required
@@ -601,18 +618,66 @@ def guardar_antecedentes(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            cedula = data.get('cedula')
+            cedula = data.pop('cedula')  # Removemos la cédula del diccionario de datos
             paciente = Paciente.objects.get(cedula=cedula)
             
             antecedentes, created = Antecedentes.objects.get_or_create(paciente=paciente)
             
-            # Actualizar campos
-            for field, value in data.items():
-                if hasattr(antecedentes, field):
-                    setattr(antecedentes, field, value)
+            # Lista de campos que esperamos actualizar
+            campos_esperados = [
+                'alergia_alimentos', 'alergia_alimentos_detalle',
+                'alergia_medicamentos', 'alergia_medicamentos_detalle',
+                'alergia_otros', 'alergia_otros_detalle',
+                'hemorragias', 'hemorragias_detalle',  # Nuevo campo
+                'vih', 'tuberculosis', 'asma',
+                'diabetes', 'hipertension',
+                'enfermedad_cardiaca', 'enfermedad_cardiaca_detalle',  # Nuevo campo
+                'otras_enfermedades', 'otras_enfermedades_detalle',
+                'tabaquismo', 'tabaquismo_detalle',
+                'alcoholismo', 'alcoholismo_detalle',
+                'dieta_alta_azucares',
+                'cepillado', 'hilo_dental', 'enjuague'
+            ]
+
+            # Actualizar cada campo si está presente en los datos
+            for campo in campos_esperados:
+                if campo in data:
+                    setattr(antecedentes, campo, data[campo])
             
             antecedentes.save()
-            return JsonResponse({'success': True})
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Antecedentes guardados correctamente',
+                'fecha_actualizacion': antecedentes.fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S')
+            })
+            
+        except Paciente.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
+        except Exception as e:
+            print(f"Error al guardar antecedentes: {str(e)}")  # Para debugging
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+@login_required
+@csrf_exempt
+def guardar_motivo(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            paciente = Paciente.objects.get(cedula=data['cedula'])
+            
+            motivo = MotivoConsulta.objects.create(
+                paciente=paciente,
+                motivo=data['motivo'],
+                problema_actual=data['problema_actual']
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Motivo de consulta guardado correctamente'
+            })
             
         except Paciente.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
@@ -620,3 +685,55 @@ def guardar_antecedentes(request):
             return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+@login_required
+def obtener_consultas(request, cedula):
+    try:
+        paciente = Paciente.objects.get(cedula=cedula)
+        consultas = MotivoConsulta.objects.filter(paciente=paciente).order_by('-fecha_registro')
+        
+        data = [{
+            'id': consulta.id,  # Agregar el ID
+            'motivo': consulta.motivo,
+            'problema_actual': consulta.problema_actual,
+            'fecha_registro': consulta.fecha_registro.isoformat()
+        } for consulta in consultas]
+        
+        return JsonResponse({'success': True, 'consultas': data})
+    except Paciente.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@csrf_exempt
+def eliminar_consulta(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            consulta_id = data.get('consulta_id')
+            
+            # Buscar y eliminar la consulta
+            consulta = MotivoConsulta.objects.get(id=consulta_id)
+            consulta.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Consulta eliminada correctamente'
+            })
+            
+        except MotivoConsulta.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Consulta no encontrada'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Método no permitido'
+    })

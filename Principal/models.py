@@ -51,9 +51,17 @@ class Antecedentes(models.Model):
     alergia_otros_detalle = models.TextField(blank=True, null=True)
     
     # Enfermedades Sistémicas
-    cancer = models.BooleanField(default=False)
-    diabetes = models.BooleanField(default=False)
+    hemorragias = models.BooleanField(default=False)
+    hemorragias_detalle = models.TextField(blank=True, null=True)  # Nuevo campo
     vih = models.BooleanField(default=False)
+    tuberculosis = models.BooleanField(default=False)
+    asma = models.BooleanField(default=False)
+    diabetes = models.BooleanField(default=False)
+    hipertension = models.BooleanField(default=False)
+    enfermedad_cardiaca = models.BooleanField(default=False)
+    enfermedad_cardiaca_detalle = models.TextField(blank=True, null=True)  # Nuevo campo
+    otras_enfermedades = models.BooleanField(default=False)
+    otras_enfermedades_detalle = models.TextField(blank=True, null=True)
     
     # Hábitos
     tabaquismo = models.BooleanField(default=False)
@@ -71,4 +79,16 @@ class Antecedentes(models.Model):
 
     def __str__(self):
         return f"Antecedentes de {self.paciente}"
+
+class MotivoConsulta(models.Model):
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE)
+    motivo = models.TextField()
+    problema_actual = models.TextField()
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha_registro']
+
+    def __str__(self):
+        return f"Consulta de {self.paciente} - {self.fecha_registro.strftime('%d/%m/%Y %H:%M')}"
 
