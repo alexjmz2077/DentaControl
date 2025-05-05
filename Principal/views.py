@@ -32,7 +32,11 @@ def validar_cedula(request):
 def inicio(request):
     context = {}
     
-    # Verificar mensajes en la sesión
+    # Check for login error in session
+    if request.session.pop('login_error', False):
+        context['login_error'] = True
+    
+    # Existing session checks
     if request.session.pop('register_success', False):
         context['register_success'] = True
     
@@ -56,9 +60,12 @@ def login_view(request):
             login(request, user)
             return redirect('inicio')
         else:
-            # Si el login falla, agregamos una variable de contexto para la alerta de error.
-            return render(request, 'inicio.html', {'login_error': True})
-    return render(request, 'inicio.html')
+            # Store error message in session instead of URL parameter
+            request.session['login_error'] = True
+            return redirect('inicio')
+    
+    # Si es GET, redirigir a inicio
+    return redirect('inicio')
 
 @login_required
 def register_view(request):

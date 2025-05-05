@@ -2,6 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar los event listeners de las pestañas
     initializeTabs();
     initializeAntecedentes();
+
+    // Agregar event listener para el campo de cédula
+    const cedulaInput = document.getElementById('cedulaSearch');
+    cedulaInput.addEventListener('keypress', function(event) {
+        // Verificar si la tecla presionada es "Enter"
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevenir el comportamiento por defecto
+            buscarPaciente(); // Llamar a la función de búsqueda
+        }
+    });
 });
 
 function initializeTabs() {
@@ -72,7 +82,16 @@ function limpiarAntecedentes() {
 async function buscarPaciente() {
     const cedula = document.getElementById('cedulaSearch').value;
     if (!cedula || cedula.length !== 10) {
-        alert('Por favor, ingrese una cédula válida');
+        Swal.fire({
+            title: 'Error',
+            text: 'Por favor, ingrese una cédula válida',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
         return;
     }
 
@@ -95,16 +114,34 @@ async function buscarPaciente() {
                 mostrarAntecedentes(dataAntecedentes.data);
             }
 
-            await cargarHistorialConsultas();
+            //await cargarHistorialConsultas();
         } else {
             // Si no se encuentra el paciente, limpiar la información anterior
             document.getElementById('pacienteInfo').style.display = 'none';
             document.getElementById('megaMenu').style.display = 'none';
-            alert('No se encontró el paciente');
+            Swal.fire({
+                title: 'Error',
+                text: 'No se encontró el paciente',
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al buscar la información');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al buscar la información',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
     }
 }
 
@@ -218,7 +255,16 @@ function mostrarAntecedentes(antecedentes) {
 async function guardarAntecedentes() {
     const cedula = document.getElementById('cedulaSearch').value;
     if (!cedula) {
-        alert('Por favor, busque primero un paciente');
+        Swal.fire({
+            title: 'Error',
+            text: 'Por favor, busque primero un paciente',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
         return;
     }
 
@@ -254,20 +300,57 @@ async function guardarAntecedentes() {
         const result = await response.json();
         
         if (result.success) {
-            alert('Antecedentes guardados exitosamente');
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Antecedentes guardados exitosamente',
+                icon: 'success',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#28a745'
+            });
         } else {
-            alert('Error al guardar: ' + result.error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al guardar: ' + result.error,
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al guardar los antecedentes');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al guardar los antecedentes',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
     }
 }
 
+// Modificar la función guardarMotivo existente
 async function guardarMotivo() {
     const cedula = document.getElementById('cedulaSearch').value;
     if (!cedula) {
-        alert('Por favor, busque primero un paciente');
+        Swal.fire({
+            title: 'Error',
+            text: 'Por favor, busque primero un paciente',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
         return;
     }
 
@@ -275,15 +358,18 @@ async function guardarMotivo() {
     const problema = document.getElementById('problemaText').value.trim();
 
     if (!motivo || !problema) {
-        alert('Por favor, complete ambos campos antes de guardar');
+        Swal.fire({
+            title: 'Error',
+            text: 'Por favor, complete ambos campos antes de guardar',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
         return;
     }
-
-    const data = {
-        cedula: cedula,
-        motivo: motivo,
-        problema_actual: problema
-    };
 
     try {
         const response = await fetch('/api/guardar_motivo/', {
@@ -292,23 +378,55 @@ async function guardarMotivo() {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                cedula: cedula,
+                motivo: motivo,
+                problema_actual: problema
+            })
         });
 
         const result = await response.json();
         
         if (result.success) {
-            alert('Motivo de consulta guardado exitosamente');
-            cargarHistorialConsultas();
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Motivo de consulta guardado exitosamente',
+                icon: 'success',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#28a745'
+            });
             // Limpiar campos
             document.getElementById('motivoText').value = '';
             document.getElementById('problemaText').value = '';
+            // Invalidar el caché para forzar una nueva carga
+            consultasCache = null;
         } else {
-            alert('Error al guardar: ' + result.error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al guardar: ' + result.error,
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al guardar el motivo de consulta');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al guardar el motivo de consulta',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
     }
 }
 
@@ -374,14 +492,25 @@ function crearItemAccordion(consulta) {
     return item;
 }
 
-// Agregar función para confirmar eliminación
+// Modificar función para confirmar eliminación
 function confirmarEliminarConsulta(consultaId) {
-    if (confirm('¿Está seguro que desea eliminar esta consulta?')) {
-        eliminarConsulta(consultaId);
-    }
+    Swal.fire({
+        title: '¿Está seguro?',
+        text: '¿Desea eliminar esta consulta?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarConsulta(consultaId);
+        }
+    });
 }
 
-// Agregar función para eliminar consulta
+// Modificar la función eliminarConsulta existente
 async function eliminarConsulta(consultaId) {
     try {
         const response = await fetch('/api/eliminar_consulta/', {
@@ -398,14 +527,81 @@ async function eliminarConsulta(consultaId) {
         const result = await response.json();
         
         if (result.success) {
-            // Recargar el historial de consultas
-            cargarHistorialConsultas();
+            // Recargar las consultas desde el servidor
+            await recargarHistorial();
+            
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Consulta eliminada correctamente',
+                icon: 'success',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#28a745'
+            });
         } else {
-            alert('Error al eliminar: ' + result.error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al eliminar: ' + result.error,
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al eliminar la consulta');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al eliminar la consulta',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
+    }
+}
+
+// Agregar nueva función para recargar el historial
+async function recargarHistorial() {
+    const cedula = document.getElementById('cedulaSearch').value;
+    
+    try {
+        const response = await fetch(`/api/consultas/${cedula}/`);
+        const data = await response.json();
+        
+        if (data.success) {
+            // Actualizar el caché con los nuevos datos
+            consultasCache = data.consultas;
+            
+            // Ajustar la página actual si es necesario
+            const totalPages = Math.ceil(consultasCache.length / itemsPerPage);
+            if (currentPage > totalPages) {
+                currentPage = Math.max(1, totalPages);
+            }
+            
+            // Mostrar las consultas actualizadas
+            mostrarConsultasPaginadas();
+        } else {
+            throw new Error(data.error || 'Error al recargar el historial');
+        }
+    } catch (error) {
+        console.error('Error al recargar el historial:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al actualizar el historial',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
     }
 }
 
@@ -418,4 +614,230 @@ function toggleAccordion(headerContent) {
     content.classList.toggle('active');
     // Rotar el ícono según el estado
     icon.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+// Variables globales para el caché y paginación
+let consultasCache = null;
+let currentPage = 1;
+const itemsPerPage = 10;
+
+// Inicializar componentes del historial
+document.addEventListener('DOMContentLoaded', function() {
+    const btnHistorial = document.getElementById('btnHistorial');
+    const historialModal = document.getElementById('historialModal');
+    const closeModal = historialModal.querySelector('.close-modal');
+    
+    btnHistorial.addEventListener('click', abrirHistorial);
+    closeModal.addEventListener('click', cerrarHistorial);
+    
+    // Cerrar modal al hacer clic fuera
+    historialModal.addEventListener('click', function(e) {
+        if (e.target === historialModal) {
+            cerrarHistorial();
+        }
+    });
+
+    // Botones de paginación
+    document.querySelector('.prev-page').addEventListener('click', () => cambiarPagina(-1));
+    document.querySelector('.next-page').addEventListener('click', () => cambiarPagina(1));
+});
+
+async function abrirHistorial() {
+    const modal = document.getElementById('historialModal');
+    const loader = modal.querySelector('.loader');
+    const consultasList = modal.querySelector('.consultas-list');
+    
+    modal.classList.add('active');
+    
+    // Mostrar loader
+
+    consultasList.innerHTML = '';
+    
+    try {
+        // Usar caché si existe
+        if (!consultasCache) {
+            const cedula = document.getElementById('cedulaSearch').value;
+            const response = await fetch(`/api/consultas/${cedula}/`);
+            const data = await response.json();
+            
+            if (data.success) {
+                consultasCache = data.consultas;
+            } else {
+                throw new Error(data.error || 'Error al cargar el historial');
+            }
+        }
+        
+        // Mostrar consultas paginadas
+        mostrarConsultasPaginadas();
+        
+    } catch (error) {
+        console.error('Error:', error);
+        consultasList.innerHTML = `<p class="error-message">${error.message}</p>`;
+    } finally {
+        loader.classList.add('hidden');
+    }
+}
+
+function cerrarHistorial() {
+    const modal = document.getElementById('historialModal');
+    modal.classList.remove('active');
+}
+
+function mostrarConsultasPaginadas() {
+    const consultasList = document.querySelector('.consultas-list');
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const consultasPaginadas = consultasCache.slice(startIndex, endIndex);
+    
+    consultasList.innerHTML = '';
+    
+    consultasPaginadas.forEach(consulta => {
+        const fecha = new Date(consulta.fecha_registro);
+        const fechaFormateada = fecha.toLocaleString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const consultaElement = document.createElement('div');
+        consultaElement.className = 'consulta-item';
+        consultaElement.innerHTML = `
+            <div class="consulta-header" onclick="toggleConsulta(this)">
+                <span class="consulta-fecha">${fechaFormateada}</span>
+                <img src="/static/img/delete.png" 
+                     class="delete-icon" 
+                     onclick="event.stopPropagation(); confirmarEliminarConsulta('${consulta.id}')" 
+                     alt="Eliminar" 
+                     title="Eliminar consulta">
+            </div>
+            <div class="consulta-content">
+                <div class="consulta-section">
+                    <h4>Motivo de Consulta:</h4>
+                    <p>${consulta.motivo}</p>
+                </div>
+                <div class="consulta-section">
+                    <h4>Enfermedad o Problema Actual:</h4>
+                    <p>${consulta.problema_actual}</p>
+                </div>
+            </div>
+        `;
+        
+        consultasList.appendChild(consultaElement);
+    });
+    
+    actualizarControlesPaginacion();
+}
+
+function actualizarControlesPaginacion() {
+    const totalPages = Math.ceil(consultasCache.length / itemsPerPage);
+    const prevButton = document.querySelector('.prev-page');
+    const nextButton = document.querySelector('.next-page');
+    const currentPageSpan = document.querySelector('.current-page');
+    
+    prevButton.disabled = currentPage === 1;
+    nextButton.disabled = currentPage === totalPages;
+    currentPageSpan.textContent = currentPage;
+}
+
+function cambiarPagina(delta) {
+    const nuevaPagina = currentPage + delta;
+    const totalPages = Math.ceil(consultasCache.length / itemsPerPage);
+    
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPages) {
+        currentPage = nuevaPagina;
+        mostrarConsultasPaginadas();
+    }
+}
+
+function toggleConsulta(header) {
+    const content = header.nextElementSibling;
+    content.classList.toggle('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejador para examen sin patología
+    const examenSinPatologia = document.getElementById('examenSinPatologia');
+    const patologiaTriggers = document.querySelectorAll('.patologia-trigger');
+
+    if (examenSinPatologia) {
+        examenSinPatologia.addEventListener('change', function() {
+            const allRadios = document.querySelectorAll('.examination-table input[type="radio"]');
+            const allPanels = document.querySelectorAll('.region-panel');
+            
+            if (this.checked) {
+                allRadios.forEach(radio => {
+                    if (radio.value === 'sp') {
+                        radio.checked = true;
+                    } else {
+                        radio.checked = false;
+                    }
+                });
+                allPanels.forEach(panel => panel.classList.add('hidden'));
+            } else {
+                allRadios.forEach(radio => radio.checked = false);
+            }
+        });
+    }
+
+    // Reemplazar el manejador para radios con patología
+    patologiaTriggers.forEach(trigger => {
+        trigger.addEventListener('click', function(event) {
+            const row = this.closest('.table-row');
+            const panel = row.querySelector('.region-panel');
+            const spRadio = row.querySelector('input[value="sp"]');
+            
+            // Si ya está seleccionado, deseleccionar
+            if (this.checked && this.dataset.wasChecked === 'true') {
+                event.preventDefault(); // Prevenir el comportamiento por defecto del radio
+                this.checked = false;
+                this.dataset.wasChecked = 'false';
+                panel.classList.add('hidden');
+                return;
+            }
+            
+            // Marcar el estado actual
+            this.dataset.wasChecked = this.checked;
+            
+            if (this.checked) {
+                // Si está marcado CP, mostrar el panel y desmarcar SP
+                panel.classList.remove('hidden');
+                spRadio.checked = false;
+                examenSinPatologia.checked = false;
+            } else {
+                // Si se desmarca CP, ocultar el panel
+                panel.classList.add('hidden');
+            }
+        });
+    });
+
+    // Manejador para radios sin patología
+    const spRadios = document.querySelectorAll('input[value="sp"]');
+    spRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                const row = this.closest('.table-row');
+                const cpRadio = row.querySelector('.patologia-trigger');
+                const panel = row.querySelector('.region-panel');
+                
+                // Si se marca SP, desmarcar CP y ocultar panel
+                cpRadio.checked = false;
+                panel.classList.add('hidden');
+            }
+        });
+    });
+});
+
+function guardarExamenEstomatognatico() {
+    Swal.fire({
+        title: 'Guardando',
+        text: 'Guardando examen estomatognático...',
+        icon: 'info',
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        toast: true,
+        iconColor: '#0dcaf0'
+    });
 }

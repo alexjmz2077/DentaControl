@@ -790,7 +790,7 @@ footer {
         height: auto; /* Mantiene la proporción de la imagen */
         max-width: 100%; /* Evita que la imagen se salga del contenedor */
         display: block; /* Elimina cualquier espacio extra generado por elementos inline */
-        margin: 0 auto; /* Centra la imagen si hay espacio disponible */
+       
         
     }
 

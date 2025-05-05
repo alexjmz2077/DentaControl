@@ -25,19 +25,6 @@ function closePopup(popupId) {
 //     window.location.href = urlAnalisis;
 // }
 
-function openNav() {
-    document.getElementById("sidebar").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
-};
-
-function closeNav() {
-    document.getElementById("sidebar").style.width = "0";
-    document.getElementById("main").style.marginLeft = "0";
-};
-
-function openLoginPopup() {
-    document.getElementById('loginPopup').style.display = 'flex';
-}
 
 function openRegisterPopup() {
     document.getElementById('registerPopup').style.display = 'flex';
@@ -48,117 +35,6 @@ function closePopup(popupId) {
 }
 
 
-
-function tutorial() {
-
-    const driver = window.driver.js.driver;
-
-    const driverObj = driver({
-    showProgress: true,
-    showButtons: ['next', 'previous'],
-    steps: [
-        {element: '.menu',  
-        popover: {
-            title: 'Menú',
-            description: 'Usa este botón para abrir el menú y navegar entre las secciones.',
-
-        }},
-        {
-            element: '.auth-buttons', // Sección de autenticación
-            popover: {
-                title: 'Autenticación',
-                description: 'Si no has iniciado sesión, haz clic aquí para iniciar o registrarte.',
-
-            }
-        },
-        {
-            element: '#startButton',
-            popover: {
-                title: 'Empezar',
-                description: 'Haz clic aquí para comenzar.',
-
-            }
-        },
-    ]
-    });
-    driverObj.drive();
-}
-
-
-function tutorial2() {
-
-    const driver = window.driver.js.driver;
-
-    const driverObj = driver({
-    showProgress: true,
-    showButtons: ['next', 'previous'],
-    steps: [
-        {
-            element: '#resultadosButton',
-            popover: {
-                title: 'Resultados',
-                description: 'Aquí puedes ver los resultados.',
-                position: 'bottom'
-            }
-        },
-        {
-            element: '#salirButton',
-            popover: {
-                title: 'Salir',
-                description: 'Haz clic aquí para salir.',
-                position: 'bottom'
-            }
-        },
-        {
-            element: '#label-container',
-            popover: {
-                title: 'Errores Peso Muerto',
-                description: 'Aqui puedes visualizar los errores en tiempo real',
-                position: 'bottom'
-            }
-        },
-    ]
-    });
-    driverObj.drive();
-}
-
-
-function tutorial3() {
-
-    const driver = window.driver.js.driver;
-
-    const driverObj = driver({
-    showProgress: true,
-    showButtons: ['next', 'previous'],
-    steps: [
-        {
-            element: '#csv',
-            popover: {
-                title: 'Guardar CSV',
-                description: 'Haz clic aquí para descargar los resultados en formato CSV.',
-                position: 'bottom'
-            }
-        },
-        {
-            element: '#pdf',
-            popover: {
-                title: 'Guardar PDF',
-                description: 'Haz clic aquí para descargar los resultados en formato PDF.',
-                position: 'bottom'
-            }
-        },
-        {
-            element: '#salirButton2',
-            popover: {
-                title: 'Salir',
-                description: 'Haz clic aquí para salir.',
-                position: 'bottom'
-            }
-        },
-    ]
-    });
-    driverObj.drive();
-}
 
 
 
@@ -217,12 +93,22 @@ function validarCedula(cedula) {
         });
 }
 
+// Reemplazar función validarFormulario
 function validarFormulario() {
     if (!cedulaValida) {
-        alert('Por favor, corrija los errores en la cédula antes de enviar el formulario.');
-        return false; // Evitar el envío del formulario
+        Swal.fire({
+            title: 'Error',
+            text: 'Por favor, corrija los errores en la cédula antes de enviar el formulario.',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
+        return false;
     }
-    return true; // Permitir el envío si todo está bien
+    return true;
 }
 
 function verPacientes() {
@@ -304,7 +190,7 @@ function cargarPacientes(filtro = '') {
         });
 }
 
-
+// Reemplazar en función guardarCambios
 function guardarCambios(id, row) {
     const datos = {
         nombres: row.querySelector('[data-field="nombres"]').textContent,
@@ -330,13 +216,27 @@ function guardarCambios(id, row) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const notification = document.createElement('div');
-            notification.className = 'save-notification';
-            notification.textContent = 'Cambios guardados';
-            row.querySelector('.action-buttons').appendChild(notification);
-            setTimeout(() => notification.remove(), 2000);
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Cambios guardados correctamente',
+                icon: 'success',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#28a745'
+            });
         } else {
-            alert('Error al actualizar los datos');
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al actualizar los datos',
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     });
 }
@@ -381,6 +281,7 @@ function confirmarEliminar(id) {
     document.body.appendChild(popup);
 }
 
+// Reemplazar en función eliminarPaciente
 function eliminarPaciente(id) {
     fetch(`/eliminar_paciente/${id}/`, {
         method: 'POST',
@@ -392,19 +293,46 @@ function eliminarPaciente(id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            cargarPacientes(); // Recargar la tabla
-            cerrarPopupEliminar(); // Usar la nueva función
-            alert('Paciente eliminado correctamente');
+            cargarPacientes();
+            cerrarPopupEliminar();
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Paciente eliminado correctamente',
+                icon: 'success',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#28a745'
+            });
         } else {
-            alert('Error al eliminar el paciente');
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al eliminar el paciente',
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error al eliminar el paciente');
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al eliminar el paciente',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
     })
     .finally(() => {
-        cerrarPopupEliminar(); // Asegurarnos de que el popup se cierre incluso si hay un error
+        cerrarPopupEliminar();
     });
 }
 

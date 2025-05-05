@@ -12,7 +12,17 @@ function Historial() {
 }
 
 function showLoginMessage() {
-    alert('Por favor, inicia sesión para acceder a esta funcionalidad.');
+    Swal.fire({
+        title: 'Error',
+        text: 'Por favor, inicia sesión para acceder a esta funcionalidad.',
+        icon: 'error',
+        position: 'top-end',          // Posición (superior derecha)
+        showConfirmButton: false,     // No mostrar botón de confirmación
+        timer: 1300,                  // Duración en ms 
+        toast: true,                 // Activar modo Toast
+        background: '#fff3cd',       // Fondo amarillo claro (opcional)
+        iconColor: '#dc3545',         // Color del icono (rojo)
+    });
 }
 
 // Funciones de manejo del sidebar

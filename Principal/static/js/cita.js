@@ -83,6 +83,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error verificando autenticación:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al verificar la autenticación de Google Calendar',
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
             document.getElementById('gcal-auth').style.display = 'flex';
             calendar.setOption('selectable', false);
         }
@@ -114,6 +124,16 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } catch (error) {
             console.error('Error al cargar pacientes:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al cargar la lista de pacientes',
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     }
 
@@ -233,7 +253,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const motivoInput = document.getElementById('motivo');
 
             if (!pacienteSelect.value || !fechaHoraInput.value || !motivoInput.value) {
-                alert('Por favor complete todos los campos');
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Por favor complete todos los campos',
+                    icon: 'error',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    toast: true,
+                    iconColor: '#dc3545'
+                });
                 return;
             }
 
@@ -278,18 +307,48 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 calendar.refetchEvents();
                 closePopup('citaPopup');
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Cita guardada correctamente',
+                    icon: 'success',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    toast: true,
+                    iconColor: '#28a745'
+                });
             } else {
                 throw new Error(result.error || 'Error al guardar la cita');
             }
         } catch (error) {
             console.error('Error completo:', error);
-            alert('Error al guardar la cita: ' + error.message);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al guardar la cita: ' + error.message,
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     };
 
     // Función para eliminar cita
     window.eliminarCita = async function() {
-        if (!confirm('¿Está seguro de eliminar esta cita?')) {
+        const result = await Swal.fire({
+            title: '¿Está seguro?',
+            text: '¿Desea eliminar esta cita?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+        });
+
+        if (!result.isConfirmed) {
             return;
         }
 
@@ -320,12 +379,31 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 calendar.refetchEvents();
                 closePopup('citaPopup');
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Cita eliminada correctamente',
+                    icon: 'success',
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    toast: true,
+                    iconColor: '#28a745'
+                });
             } else {
                 throw new Error(result.error || 'Error al eliminar la cita');
             }
         } catch (error) {
             console.error('Error completo:', error);
-            alert('Error al eliminar la cita: ' + error.message);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al eliminar la cita: ' + error.message,
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
         }
     };
 

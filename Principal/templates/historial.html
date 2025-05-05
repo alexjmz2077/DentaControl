@@ -7,11 +7,14 @@
     <link rel="icon" href="{% static 'img/diente2.ico' %}" type="image/x-icon">
     <title>DentaControl</title>
 
-    <!-- Custom JS -->
+    <!-- JS -->
     <script src="{% static 'js/historial.js' %}" defer></script>
     <script src="{% static 'js/general.js' %}" defer></script>
 
+    <!-- Libreria para Alertas  -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Css -->
     <link rel="stylesheet" href="{% static 'css/historial.css' %}">
     <link rel="stylesheet" href="{% static 'css/general.css' %}">
     
@@ -124,8 +127,8 @@
                         <button class="tab-btn" data-tab="motivo">
                             📋 Motivo de Consulta
                         </button>
-                        <button class="tab-btn" data-tab="signos">
-                            💓 Signos Vitales
+                        <button class="tab-btn" data-tab="estomatognatico">
+                            📝 Examen Estomatognático
                         </button>
                         <button class="tab-btn" data-tab="odontograma">
                             🦷 Odontograma
@@ -346,19 +349,330 @@
                                     <button id="guardarMotivo" class="btn-save" onclick="guardarMotivo()">
                                         💾 Guardar
                                     </button>
+                                    <button id="btnHistorial" class="btn-save">
+                                        📖 Historial
+                                    </button>
                                 </div>
+                            </div>
 
-                                <!-- Historial de consultas -->
-                                <div class="historial-section">
-                                    <h3>📖 Historial de Consultas</h3>
-                                    <div id="consultasAccordion" class="accordion">
-                                        <!-- El contenido se llenará dinámicamente -->
+                            
+
+                            <!-- Modal del historial -->
+                            <div id="historialModal" class="modal">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2>Historial de Consultas</h2>
+                                        <button class="close-modal">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="loader hidden"></div>
+                                        <div class="consultas-list"></div>
+                                        <div class="pagination">
+                                            <button class="prev-page" disabled>Anterior</button>
+                                            <span class="page-info">Página <span class="current-page">1</span></span>
+                                            <button class="next-page">Siguiente</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div id="signos" class="tab-pane">
-                            <!-- Contenido de Signos Vitales -->
+                        <div id="estomatognatico" class="tab-pane">
+                            <div class="estomatognatico-container">
+                                <div class="examination-grid">
+                                    <!-- Columna izquierda con la imagen -->
+                                    <div class="image-section">
+                                        <img src="{% static 'img/boca.png' %}" alt="Diagrama del Sistema Estomatognático" class="anatomy-image">
+                                    </div>
+                                    
+                                    <!-- Columna derecha con el formulario -->
+                                    <div class="examination-form">
+                                        <h3>Regiones Estomatognáticas</h3>
+                                        
+                                        <!-- Checkbox para examen sin patología -->
+                                        <div class="no-pathology-check">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="examenSinPatologia">
+                                                <span>Examen sin patología</span>
+                                            </label>
+                                        </div>
+
+                                        <!-- Tabla de examinación -->
+                                        <div class="examination-table">
+                                            <div class="table-header">
+                                                <div class="cell">Región</div>
+                                                <div class="cell">CP</div>
+                                                <div class="cell">SP</div>
+                                            </div>
+
+                                            <!-- Articulación Témporo-mandibular -->
+                                            <div class="table-row">
+                                                <div class="cell">Articulación Témporo-mandibular</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="atm" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="atm" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Carillos -->
+                                            <div class="table-row">
+                                                <div class="cell">Carillos</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="carillos" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="carillos" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Glandulas Salivales -->
+                                            <div class="table-row">
+                                                <div class="cell">Glándulas Salivales</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="glandulas_salivales" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="glandulas_salivales" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Ganglios de cabeza y cuello -->
+                                             <div class="table-row">
+                                                <div class="cell">Ganglios de cabeza y cuello</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="ganglios_cabeza_cuello" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="ganglios_cabeza_cuello" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Lengua -->
+                                            <div class="table-row">
+                                                <div class="cell">Lengua</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="lengua" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="lengua" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Labios -->
+                                            <div class="table-row">
+                                                <div class="cell">Labios</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="labios" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="labios" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Mejillas -->
+                                            <div class="table-row">
+                                                <div class="cell">Mejillas</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="mejillas" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="mejillas" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Maxilar Inferior -->
+                                            <div class="table-row">
+                                                <div class="cell">Maxilar Inferior</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="maxilar_inferior" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="maxilar_inferior" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Maxilar Superior -->
+                                            <div class="table-row">
+                                                <div class="cell">Maxilar Superior</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="maxilar_superior" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="maxilar_superior" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Paladar -->
+                                            <div class="table-row">
+                                                <div class="cell">Paladar</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="paladar" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="paladar" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Piso de boca -->
+                                            <div class="table-row">
+                                                <div class="cell">Piso de boca</div>
+                                                <div class="cell">
+                                                    <input type="radio" name="piso_boca" value="cp" class="patologia-trigger">
+                                                </div>
+                                                <div class="cell">
+                                                    <input type="radio" name="piso_boca" value="sp">
+                                                </div>
+                                                <div class="patologia-panel region-panel hidden">
+                                                    <div class="patologia-options">
+                                                        <label><input type="checkbox" name="atm_absceso">Absceso</label>
+                                                        <label><input type="checkbox" name="atm_fibroma">Fibroma</label>
+                                                        <label><input type="checkbox" name="atm_herpes">Herpes</label>
+                                                        <label><input type="checkbox" name="atm_ulcera">Úlcera</label>
+                                                        <label><input type="checkbox" name="atm_otra">Otra patología</label>
+                                                    </div>
+                                                    <textarea class="observacion-input" placeholder="Observación..."></textarea>>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Panel de patologías (inicialmente oculto) -->
+                                        <div class="patologia-panel hidden">
+                                            <h4>Seleccione la patología:</h4>
+                                            <div class="patologia-options">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="absceso">
+                                                    <span>Absceso</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="fibroma">
+                                                    <span>Fibroma</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="herpes">
+                                                    <span>Herpes</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="ulcera">
+                                                    <span>Úlcera</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" name="otra">
+                                                    <span>Otra patología</span>
+                                                </label>
+                                            </div>
+                                            <textarea class="observacion-input" placeholder="Observación..."></textarea>
+                                        </div>
+
+                                        <!-- Botón guardar -->
+                                        <div class="save-section">
+                                            <button class="btn-save" onclick="guardarExamenEstomatognatico()">
+                                                💾 Guardar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div id="odontograma" class="tab-pane">
                             <!-- Contenido de Odontograma -->
@@ -383,7 +697,7 @@
                     DentaControl © 2024 <br> Software de gestión dental en la nube. 
                 </div>
                 <div class="card">
-                    <a class="social-link1" href="https://www.instagram.com/alexjmz__/">
+                    <a class="social-link1" href="https://www.instagram.com/dentacontrol/">
                         <svg viewBox="0 0 16 16" class="bi bi-instagram" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg">
                             <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0h.003zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599.28.28.453.546.598.92.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.47 2.47 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.478 2.478 0 0 1-.92-.598 2.48 2.48 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233 0-2.136.008-2.388.046-3.231.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92.28-.28.546-.453.92-.598.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045v.002zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92zm-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217zm0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334z"></path>
                         </svg>
