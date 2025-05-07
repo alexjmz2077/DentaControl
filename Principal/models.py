@@ -92,3 +92,22 @@ class MotivoConsulta(models.Model):
     def __str__(self):
         return f"Consulta de {self.paciente} - {self.fecha_registro.strftime('%d/%m/%Y %H:%M')}"
 
+class ExamenEstomatognatico(models.Model):
+    paciente = models.ForeignKey('Paciente', on_delete=models.CASCADE)
+    fecha = models.DateTimeField(auto_now_add=True)
+    examen_sin_patologia = models.BooleanField(default=False)
+    regiones = models.JSONField(default=dict)
+    # Estructura ejemplo:
+    # {
+    #   "atm": {
+    #       "cp": true,
+    #       "sp": false,
+    #       "patologias": ["absceso", "fibroma"],
+    #       "observacion": "Texto..."
+    #   },
+    #   ...
+    # }
+
+    def __str__(self):
+        return f"Examen estomatognático de {self.paciente} - {self.fecha.strftime('%d/%m/%Y %H:%M')}"
+

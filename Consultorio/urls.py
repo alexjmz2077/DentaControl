@@ -51,4 +51,7 @@ urlpatterns = [
     path('api/guardar_motivo/', views.guardar_motivo, name='guardar_motivo'),
     path('api/consultas/<str:cedula>/', views.obtener_consultas, name='obtener_consultas'),
     path('api/eliminar_consulta/', views.eliminar_consulta, name='eliminar_consulta'),
+    path('api/guardar_examen_estomatognatico/', views.guardar_examen_estomatognatico, name='guardar_examen_estomatognatico'),
+    path('api/historial_examenes_estomatognatico/<str:cedula>/', views.historial_examenes_estomatognatico, name='historial_examenes_estomatognatico'),
+    path('api/eliminar_examen_estomatognatico/', views.eliminar_examen_estomatognatico, name='eliminar_examen_estomatognatico'),
 ]

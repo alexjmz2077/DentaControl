@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Paciente, Antecedentes, MotivoConsulta
+from .models import Paciente, Antecedentes, MotivoConsulta, ExamenEstomatognatico
 from django.http import JsonResponse
 from django.db.models import Q
 import json
@@ -744,3 +744,59 @@ def eliminar_consulta(request):
         'success': False,
         'error': 'Método no permitido'
     })
+
+@login_required
+@csrf_exempt
+def guardar_examen_estomatognatico(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cedula = data.get('cedula')
+            examen_sin_patologia = data.get('examen_sin_patologia', False)
+            regiones = data.get('regiones', {})
+
+            paciente = Paciente.objects.get(cedula=cedula)
+
+            ExamenEstomatognatico.objects.create(
+                paciente=paciente,
+                examen_sin_patologia=examen_sin_patologia,
+                regiones=regiones
+            )
+            return JsonResponse({'success': True, 'message': 'Examen guardado correctamente'})
+        except Paciente.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+@login_required
+def historial_examenes_estomatognatico(request, cedula):
+    try:
+        paciente = Paciente.objects.get(cedula=cedula)
+        examenes = ExamenEstomatognatico.objects.filter(paciente=paciente).order_by('-fecha')
+        data = [{
+            'id': examen.id,
+            'fecha': examen.fecha.isoformat(),
+            'regiones': examen.regiones
+        } for examen in examenes]
+        return JsonResponse({'success': True, 'examenes': data})
+    except Paciente.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Paciente no encontrado'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@login_required
+@csrf_exempt
+def eliminar_examen_estomatognatico(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            examen_id = data.get('examen_id')
+            examen = ExamenEstomatognatico.objects.get(id=examen_id)
+            examen.delete()
+            return JsonResponse({'success': True, 'message': 'Examen eliminado correctamente'})
+        except ExamenEstomatognatico.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Examen no encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})

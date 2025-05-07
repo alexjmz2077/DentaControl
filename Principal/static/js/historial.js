@@ -763,48 +763,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (examenSinPatologia) {
         examenSinPatologia.addEventListener('change', function() {
-            const allRadios = document.querySelectorAll('.examination-table input[type="radio"]');
+            const allCP = document.querySelectorAll('.examination-table input[type="checkbox"][value="cp"]');
+            const allSP = document.querySelectorAll('.examination-table input[type="checkbox"][value="sp"]');
             const allPanels = document.querySelectorAll('.region-panel');
-            
+
             if (this.checked) {
-                allRadios.forEach(radio => {
-                    if (radio.value === 'sp') {
-                        radio.checked = true;
-                    } else {
-                        radio.checked = false;
-                    }
-                });
+                allSP.forEach(sp => sp.checked = true);
+                allCP.forEach(cp => cp.checked = false);
                 allPanels.forEach(panel => panel.classList.add('hidden'));
             } else {
-                allRadios.forEach(radio => radio.checked = false);
+                allSP.forEach(sp => sp.checked = false);
+                allCP.forEach(cp => cp.checked = false);
+                allPanels.forEach(panel => panel.classList.add('hidden'));
             }
         });
     }
 
-    // Reemplazar el manejador para radios con patología
+    // Reemplazar el manejador para checkbox con patología
     patologiaTriggers.forEach(trigger => {
-        trigger.addEventListener('click', function(event) {
+        trigger.addEventListener('change', function() {
             const row = this.closest('.table-row');
             const panel = row.querySelector('.region-panel');
-            const spRadio = row.querySelector('input[value="sp"]');
-            
-            // Si ya está seleccionado, deseleccionar
-            if (this.checked && this.dataset.wasChecked === 'true') {
-                event.preventDefault(); // Prevenir el comportamiento por defecto del radio
-                this.checked = false;
-                this.dataset.wasChecked = 'false';
-                panel.classList.add('hidden');
-                return;
-            }
-            
-            // Marcar el estado actual
-            this.dataset.wasChecked = this.checked;
-            
+            const spCheckbox = row.querySelector('input[type="checkbox"][value="sp"]');
+
             if (this.checked) {
-                // Si está marcado CP, mostrar el panel y desmarcar SP
+                // Si se marca CP, mostrar el panel y desmarcar SP y "Examen sin patología"
                 panel.classList.remove('hidden');
-                spRadio.checked = false;
-                examenSinPatologia.checked = false;
+                if (spCheckbox) spCheckbox.checked = false;
+                if (typeof examenSinPatologia !== 'undefined' && examenSinPatologia) examenSinPatologia.checked = false;
             } else {
                 // Si se desmarca CP, ocultar el panel
                 panel.classList.add('hidden');
@@ -829,15 +815,341 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function guardarExamenEstomatognatico() {
-    Swal.fire({
-        title: 'Guardando',
-        text: 'Guardando examen estomatognático...',
-        icon: 'info',
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 3000,
-        toast: true,
-        iconColor: '#0dcaf0'
+async function guardarExamenEstomatognatico() {
+    const cedula = document.getElementById('cedulaSearch').value;
+    if (!cedula) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Por favor, busque primero un paciente',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
+        return;
+    }
+
+    const examenSinPatologia = document.getElementById('examenSinPatologia').checked;
+
+    // Recolectar datos de cada región
+    const regiones = {};
+    let regionesIncompletas = [];
+    document.querySelectorAll('.examination-table .table-row').forEach(row => {
+        const cpInput = row.querySelector('input[value="cp"]');
+        const spInput = row.querySelector('input[value="sp"]');
+        if (!cpInput || !spInput) return; // Saltar filas vacías
+
+        const regionName = cpInput.name;
+        const cp = cpInput.checked;
+        const sp = spInput.checked;
+        const panel = row.querySelector('.region-panel');
+        let patologias = [];
+        let observacion = "";
+
+        if (panel && !panel.classList.contains('hidden')) {
+            patologias = Array.from(panel.querySelectorAll('.patologia-options input[type="checkbox"]:checked'))
+                .map(cb => {
+                    const parts = cb.name.split('_');
+                    return parts.length > 1 ? parts.slice(1).join('_') : cb.name;
+                });
+            observacion = panel.querySelector('.observacion-input')?.value || "";
+        }
+
+        // Validar que al menos uno esté marcado
+        if (!cp && !sp) {
+            const regionLabel = row.querySelector('.cell').textContent.trim();
+            regionesIncompletas.push(regionLabel);
+        }
+
+        regiones[regionName] = {
+            cp,
+            sp,
+            patologias,
+            observacion
+        };
     });
+
+    if (regionesIncompletas.length > 0) {
+        Swal.fire({
+            title: 'Campos incompletos',
+            html: 'Debe de completar todos los campos',
+            icon: 'warning',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/guardar_examen_estomatognatico/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                cedula: cedula,
+                examen_sin_patologia: examenSinPatologia,
+                regiones: regiones
+            })
+        });
+        const result = await response.json();
+        if (result.success) {
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Examen estomatognático guardado correctamente',
+                icon: 'success',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#28a745'
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al guardar: ' + result.error,
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al guardar el examen',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
+    }
+}
+
+// --- Examen Estomatognático Historial ---
+let examenesCache = null;
+let currentPageExamen = 1;
+const itemsPerPageExamen = 10;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btnHistorialExamen = document.getElementById('btnHistorialExamen');
+    const historialExamenModal = document.getElementById('historialExamenModal');
+    const closeModalExamen = historialExamenModal.querySelector('.close-modal-examen');
+
+    btnHistorialExamen.addEventListener('click', abrirHistorialExamen);
+    closeModalExamen.addEventListener('click', cerrarHistorialExamen);
+
+    historialExamenModal.addEventListener('click', function(e) {
+        if (e.target === historialExamenModal) {
+            cerrarHistorialExamen();
+        }
+    });
+
+    document.querySelector('.prev-page-examen').addEventListener('click', () => cambiarPaginaExamen(-1));
+    document.querySelector('.next-page-examen').addEventListener('click', () => cambiarPaginaExamen(1));
+});
+
+async function abrirHistorialExamen() {
+    const modal = document.getElementById('historialExamenModal');
+    const loader = modal.querySelector('.loader');
+    const examenesList = modal.querySelector('.examenes-list');
+    modal.classList.add('active');
+    examenesList.innerHTML = '';
+    loader.classList.remove('hidden');
+
+    try {
+        // Siempre recargar desde el servidor
+        const cedula = document.getElementById('cedulaSearch').value;
+        const response = await fetch(`/api/historial_examenes_estomatognatico/${cedula}/`);
+        const data = await response.json();
+        if (data.success) {
+            examenesCache = data.examenes;
+            currentPageExamen = 1; // Reiniciar a la primera página
+        } else {
+            throw new Error(data.error || 'Error al cargar el historial');
+        }
+        mostrarExamenesPaginados();
+    } catch (error) {
+        examenesList.innerHTML = `<p class="error-message">${error.message}</p>`;
+    } finally {
+        loader.classList.add('hidden');
+    }
+}
+
+function cerrarHistorialExamen() {
+    document.getElementById('historialExamenModal').classList.remove('active');
+}
+
+function mostrarExamenesPaginados() {
+    const examenesList = document.querySelector('.examenes-list');
+    const startIndex = (currentPageExamen - 1) * itemsPerPageExamen;
+    const endIndex = startIndex + itemsPerPageExamen;
+    const examenesPaginados = examenesCache.slice(startIndex, endIndex);
+
+    examenesList.innerHTML = '';
+    examenesPaginados.forEach(examen => {
+        const fecha = new Date(examen.fecha);
+        const fechaFormateada = fecha.toLocaleString('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Tabla para regiones
+        let regionesHtml = `
+            <table class="tabla-regiones-historial" style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Región</th>
+                        <th style="text-align:left;">Estado</th>
+                        <th style="text-align:left;">Patologías</th>
+                        <th style="text-align:left;">Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        for (const [region, info] of Object.entries(examen.regiones)) {
+            let estado = '';
+            let patologias = '';
+            let observacion = '';
+            if (info.cp) {
+                estado = 'CP';
+                patologias = (info.patologias && info.patologias.length) ? info.patologias.join(', ') : '-';
+                observacion = info.observacion || '-';
+            } else if (info.sp) {
+                estado = 'SP';
+                patologias = '-';
+                observacion = '-';
+            } else {
+                estado = 'No examinado';
+                patologias = '-';
+                observacion = '-';
+            }
+            regionesHtml += `
+                <tr>
+                    <td>${region.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                    <td>${estado}</td>
+                    <td>${patologias}</td>
+                    <td>${observacion}</td>
+                </tr>
+            `;
+        }
+        regionesHtml += '</tbody></table>';
+
+        const examenElement = document.createElement('div');
+        examenElement.className = 'consulta-item';
+        examenElement.innerHTML = `
+            <div class="consulta-header" onclick="toggleConsulta(this)">
+                <span class="consulta-fecha">${fechaFormateada}</span>
+                <img src="/static/img/delete.png" 
+                     class="delete-icon" 
+                     onclick="event.stopPropagation(); confirmarEliminarExamen('${examen.id}')" 
+                     alt="Eliminar" 
+                     title="Eliminar examen">
+            </div>
+            <div class="consulta-content">
+                <div class="consulta-section">
+                    <h4>Regiones Estomatognáticas:</h4>
+                    ${regionesHtml}
+                </div>
+            </div>
+        `;
+        examenesList.appendChild(examenElement);
+    });
+
+    actualizarControlesPaginacionExamen();
+}
+
+function actualizarControlesPaginacionExamen() {
+    const totalPages = Math.ceil(examenesCache.length / itemsPerPageExamen);
+    document.querySelector('.prev-page-examen').disabled = currentPageExamen === 1;
+    document.querySelector('.next-page-examen').disabled = currentPageExamen === totalPages;
+    document.querySelector('.current-page-examen').textContent = currentPageExamen;
+}
+
+function cambiarPaginaExamen(delta) {
+    const totalPages = Math.ceil(examenesCache.length / itemsPerPageExamen);
+    const nuevaPagina = currentPageExamen + delta;
+    if (nuevaPagina >= 1 && nuevaPagina <= totalPages) {
+        currentPageExamen = nuevaPagina;
+        mostrarExamenesPaginados();
+    }
+}
+
+function confirmarEliminarExamen(examenId) {
+    Swal.fire({
+        title: '¿Está seguro?',
+        text: '¿Desea eliminar este examen?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarExamenEstomatognatico(examenId);
+        }
+    });
+}
+
+async function eliminarExamenEstomatognatico(examenId) {
+    try {
+        const response = await fetch('/api/eliminar_examen_estomatognatico/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ examen_id: examenId })
+        });
+        const result = await response.json();
+        if (result.success) {
+            await abrirHistorialExamen(); // Recarga el historial
+            Swal.fire({
+                title: 'Éxito',
+                text: 'Examen eliminado correctamente',
+                icon: 'success',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#28a745'
+            });
+        } else {
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al eliminar: ' + result.error,
+                icon: 'error',
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                toast: true,
+                iconColor: '#dc3545'
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al eliminar el examen',
+            icon: 'error',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            toast: true,
+            iconColor: '#dc3545'
+        });
+    }
 }

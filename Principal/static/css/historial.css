@@ -218,6 +218,7 @@
 .checkbox-text {
     color: #495057;
     font-size: 1rem;
+    border-radius: 6px;
 }
 
 /* Actualizar estilos para description-input */
@@ -471,7 +472,7 @@
     align-items: center;
 }
 
-.cell input[type="radio"] {
+.cell input[type="checkbox"] {
     width: 16px;
     height: 16px;
     cursor: pointer;
@@ -500,9 +501,13 @@
     gap: 0.5rem;
     font-size: 0.9rem;
 }
+.region-panel .patologia-options label,
+.region-panel .patologia-options input[type="checkbox"] {
+    cursor: pointer;
+}
 
 .region-panel .observacion-input {
-    width: 100%;
+    width: 90%;
     padding: 0.5rem;
     margin-top: 0.5rem;
     min-height: 60px;
@@ -634,10 +639,11 @@
     position: relative;
     background-color: white;
     width: 90%;
-    max-width: 800px;
+    max-width: 80%;
+    height: 90%;
     margin: 2rem auto;
     border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     transform: translateY(-20px);
     transition: transform 0.3s ease;
 }
@@ -716,7 +722,7 @@
 
 .consulta-content.active {
     padding: 1rem;
-    max-height: 500px;
+    max-height: fit-content;
 }
 
 .consulta-section {
@@ -761,4 +767,35 @@
         width: 95%;
         margin: 1rem auto;
     }
+}
+
+.tabla-regiones-historial {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.tabla-regiones-historial th,
+.tabla-regiones-historial td {
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 0.75rem;
+    white-space: pre-line;
+    word-break: break-word;
+    background: #fff;
+}
+
+.tabla-regiones-historial th {
+    background: #f1f5f9;
+    color: #031749;
+    font-weight: 600;
+    text-align: left;
+}
+
+.tabla-regiones-historial td:last-child,
+.tabla-regiones-historial th:last-child {
+    width: 50%;
+    max-width: 50%;
+    min-width: 180px;
+    white-space: pre-line;
+    word-break: break-word;
 }
